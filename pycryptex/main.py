@@ -52,7 +52,7 @@ def cli(config, verbose):
 @cli.command()
 @click.argument('file', required=True)
 @click.option('--pubkey', default="my_key.pub", help='(optional) specify the RSA public key')
-@click.option('--remove', is_flag=True, help="(optional, bool=False) to indicate if remove or not the file")
+@click.option('--remove','-r', is_flag=True, help="(optional, bool=False) to indicate if remove or not the file")
 @pass_config
 def encrypt(config, file, pubkey, remove):
     """Encrypt a file"""
@@ -63,7 +63,7 @@ def encrypt(config, file, pubkey, remove):
         rsa.encrypt_file(file=file, public_key=pubkey, remove=remove)
         if config.verbose:
             click.echo(click.style(f"pubkey used is: {pubkey}", fg="magenta", bold=False))
-            click.echo(click.style("File encrypted successfully!", fg="green", bold=True))
+        click.echo(click.style("File encrypted successfully!", fg="green", bold=True))
     except Exception as e:
         click.echo(click.style(f"Houston, we have a problem: {e}", fg="red", bold=True))
         sys.exit(2)
@@ -72,7 +72,7 @@ def encrypt(config, file, pubkey, remove):
 @cli.command()
 @click.argument('file', required=True)
 @click.option('--privkey', default="my_key", help='(optional) specify the RSA private key')
-@click.option('--remove', is_flag=True, help="(optional, bool=False) to indicate if remove or not the encrypted file")
+@click.option('--remove', '-r', is_flag=True, help="(optional, bool=False) to indicate if remove or not the encrypted file")
 @click.option('-s', is_flag=True, help="(optional, bool=False) to indicate destroy file after open")
 @click.option('--pager', '-p', is_flag=True,
               help="(optional, bool=False) to open or not the pager to read decrypted file")
@@ -92,7 +92,7 @@ def decrypt(config, file, privkey, remove, s, pager):
             os.remove(f)
         if config.verbose:
             click.echo(click.style(f"priv_key used is: {privkey}", fg="magenta", bold=False))
-            click.echo(click.style("File decrypted successfully!", fg="green", bold=True))
+        click.echo(click.style("File decrypted successfully!", fg="green", bold=True))
     except Exception as e:
         click.echo(click.style(f"Houston, we have a problem: {e}", fg="red", bold=True))
         sys.exit(2)
