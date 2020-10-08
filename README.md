@@ -1,0 +1,83 @@
+# PyCryptex
+This project is a CLI application for encryption and decryption using the pycryptodome package. For the CLI functionality it uses
+Click package.
+
+
+## Configuration for developers
+
+If you want to contribute to that project, after cloning the repo type:
+```shell script
+python3 -m venv venv
+source venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# (optional) to test type
+python3 -m Crypto.SelfTest
+```
+
+If you need to create a new key pair you can use ssh-keygen. In such case type:
+```shell script
+ssh-keygen -t rsa -b 4096 -C "<your-user>@<your-domain>"
+```
+
+To install the executable package type:
+````shell script
+pip3 install --editable .
+````
+
+To test the application type:
+```shell script
+pytest
+```
+
+## Install application
+
+If you like pycryptex and you want to use simply type:
+```shell script
+pip3 install pycryptex
+```
+
+## Using application
+
+You can get help with:
+````shell script
+pycryptex --help
+````
+
+To encrypt/decrypt some content ``pycryptex`` uses RSA keys pair. The default keys name:
+- my_key: for the private key
+- my_key.pub: for the public key
+The folder where **`pycryptex`** searches for the key is your $HOME/.pycryptex. If you prefer to use your own
+keys you can pass them directly as an argument to the encrypt and decrypt method.
+
+### Configuration file
+
+PyCryptex reads a configuration file located in your $HOME/.pycryptex folder named **pycryptex.toml**.
+The file has the following syntax:
+```toml
+[config]
+pager = "<path to the pager application where to see decrypted file>"
+```
+
+### Some examples
+or to get help for a specific command:
+```shell script
+# pycrypto <command> --help
+# for instance
+pycryptex encrypt --help
+```
+some basic example usages are:
+````shell script
+# to encrypt
+pycryptex encrypt --pubkey keys/my_key.pub test/secret.txt
+
+# to decrypt and delete the encrypted file
+pycryptex --verbose decrypt --privkey keys/my_key  --remove test/secrets.txt.enc
+
+# decrypt, open the pager and then delete the decrypted file
+pycryptex --verbose decrypt --privkey keys/my_key  -s -p  test/secrets.txt.enc
+
+# decrypt, open the pager and then delete the decrypted file (loading keys from $HOME/.pycryptex)
+pycryptex decrypt -sp test/secrets.txt.enc
+````
