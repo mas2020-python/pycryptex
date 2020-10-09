@@ -54,10 +54,13 @@ keys you can pass them directly as an argument to the encrypt and decrypt method
 ### Configuration file
 
 PyCryptex reads a configuration file located in your $HOME/.pycryptex folder named **pycryptex.toml**.
-The file has the following syntax:
+The file has the following syntax (reported are the default file):
 ```toml
 [config]
-pager = "<path to the pager application where to see decrypted file>"
+# path to the pager application where to see decrypted file
+pager = "vim"
+# number of seconds the application will delete a file decrypted passing the s option flag
+wait_delete_time = 2
 ```
 
 ### Some examples
