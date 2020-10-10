@@ -2,6 +2,7 @@
 This module shows an example of encrypt and decrypt using RSA algorithm.
 """
 import os
+from pathlib import Path
 
 from Crypto.PublicKey import RSA
 from Crypto.Random import get_random_bytes
@@ -66,7 +67,7 @@ def encrypt_file(file: str, public_key: str, remove=False):
         os.remove(file)
 
 
-def decrypt_file(file: str, private_key: str, remove=False):
+def decrypt_file(file: str, private_key: str, remove=False, passprhase=None):
     """
     Decrypt the file passed as argument and create a new file removing the .enc extension.
 
@@ -78,14 +79,15 @@ def decrypt_file(file: str, private_key: str, remove=False):
     with open(file, 'rb') as byte_reader:
         # Read all bytes
         enc_bytes = byte_reader.read(-1)
-    clear_bytes_list = decrypt_data(enc_bytes, private_key)
+    clear_bytes_list = decrypt_data(enc_bytes, private_key, passprhase)
     with open(file[:-4], "wb") as f:
         f.write(clear_bytes_list)
     if remove:
         os.remove(file)
     return file[:-4]
 
-def decrypt_data(enc_data: bytes, private_key: str) -> bytes:
+
+def decrypt_data(enc_data: bytes, private_key: str, passprhase=None) -> bytes:
     """
     Decrypt data doing the following:
     - get encrypted key and nonce and tag + decrypted bytes
@@ -98,7 +100,7 @@ def decrypt_data(enc_data: bytes, private_key: str) -> bytes:
     """
 
     # load the RSA private key
-    private_key = RSA.import_key(open(private_key).read())
+    private_key = RSA.import_key(open(private_key).read(), passphrase=passprhase)
     # get the single elements from bytes list
     enc_session_key = enc_data[:private_key.size_in_bytes()]
     nonce = enc_data[private_key.size_in_bytes():private_key.size_in_bytes() + 16]
@@ -113,3 +115,27 @@ def decrypt_data(enc_data: bytes, private_key: str) -> bytes:
     cipher_aes = AES.new(session_key, AES.MODE_EAX, nonce)
     data = cipher_aes.decrypt_and_verify(ciphertext, tag)
     return data
+
+
+def create_keys(folder: str, passprhase=None):
+    """
+    Create a public key and private key pair
+    :param folder: directory where to create the my_key and my_key.pub files
+    :return: None
+    """
+    key = RSA.generate(2048)
+    private_key = None
+    if passprhase:
+        private_key = key.export_key(passphrase=passprhase, pkcs=8,
+                                     protection="scryptAndAES128-CBC")
+        print("pk with passprhase")
+    else:
+        private_key = key.export_key()
+        print("pk with NO passprhase")
+
+    with open(os.path.join(folder, "my_key"), "wb") as file_out:
+        file_out.write(private_key)
+
+    public_key = key.publickey().export_key()
+    with open(os.path.join(folder, "my_key.pub"), "wb") as file_out:
+        file_out.write(public_key)
