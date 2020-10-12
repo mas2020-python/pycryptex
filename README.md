@@ -54,23 +54,35 @@ keys you can pass them directly as an argument to the encrypt and decrypt method
 ### Configuration file
 
 PyCryptex reads a configuration file located in your $HOME/.pycryptex folder named **pycryptex.toml**.
-The file has the following syntax:
+The file has the following syntax (reported are the default file):
 ```toml
 [config]
-pager = "<path to the pager application where to see decrypted file>"
+# path to the pager application where to see decrypted file
+pager = "vim"
+# number of seconds the application will delete a file decrypted passing the s option flag
+wait_delete_time = 2
 ```
 
-### Some examples
-or to get help for a specific command:
+### List of all commands
+
+To an explanation of all the option of a specific command take a look directly at:
 ```shell script
-# pycrypto <command> --help
-# for instance
 pycryptex encrypt --help
 ```
-some basic example usages are:
+
+Follow the list of commands:
+- `encrypt`: to encrypt a single file
+- `decrypt`: to decrypt a single file
+- `create-keys`: to create a public key and private key pair.
+
+### Some examples
+Some basic example usages are:
 ````shell script
-# to encrypt
+# to encrypt passing a key
 pycryptex encrypt --pubkey keys/my_key.pub test/secret.txt
+
+# to encrypt using the my_key.pub in $HOME/.pycryptex folder
+pycryptex encrypt test/secret.txt
 
 # to decrypt and delete the encrypted file
 pycryptex --verbose decrypt --privkey keys/my_key  --remove test/secrets.txt.enc
@@ -80,4 +92,7 @@ pycryptex --verbose decrypt --privkey keys/my_key  -s -p  test/secrets.txt.enc
 
 # decrypt, open the pager and then delete the decrypted file (loading keys from $HOME/.pycryptex)
 pycryptex decrypt -sp test/secrets.txt.enc
+
+# to create private and public key pair
+pycryptex create-keys
 ````

@@ -1,15 +1,12 @@
-# This is a sample Python script.
-
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 import os
 import subprocess
 import sys
+from getpass import getpass
 from pathlib import Path
 from pycryptex.crypto import rsa
 import pycryptex
 from os import path
-
+import time
 import click
 import toml
 
@@ -30,7 +27,7 @@ pass_config = click.make_pass_decorator(Config, ensure=True)
 
 @click.group()
 @click.version_option(version=None, message="pycryptex CLI application (version: %(version)s)")
-@click.option('--verbose', is_flag=True, help='bool, to specify if needed a verbose mode')
+@click.option('--verbose', "-v", is_flag=True, help='bool, to specify if needed a verbose mode')
 @pass_config
 def cli(config, verbose):
     """
@@ -52,7 +49,8 @@ def cli(config, verbose):
 @cli.command()
 @click.argument('file', required=True)
 @click.option('--pubkey', default="my_key.pub", help='(optional) specify the RSA public key')
-@click.option('--remove', is_flag=True, help="(optional, bool=False) to indicate if remove or not the file")
+@click.option('--remove', '-r', is_flag=True, help="(optional, bool=False) to indicate if remove or not the "
+                                                   "original clear file")
 @pass_config
 def encrypt(config, file, pubkey, remove):
     """Encrypt a file"""
@@ -60,20 +58,31 @@ def encrypt(config, file, pubkey, remove):
         # in case of pubkey is not passed, pycryptex calculates the default path
         if pubkey == "my_key.pub":
             pubkey = os.path.join(get_home(), '.pycryptex', pubkey)
+        # check if pubkey exists
+        if not path.exists(pubkey):
+            click.echo(
+                click.style(f"Houston, we have a problem: the pubkey is missing in '{pubkey}'", fg="red", bold=False))
+            click.echo("If you have your own key, pass the --pubkey argument or, if you need pycryptex create "
+                       "the keys for you, type:\n"
+                       "pycryptex create-keys")
+            return
+        # encryption of the file
         rsa.encrypt_file(file=file, public_key=pubkey, remove=remove)
         if config.verbose:
             click.echo(click.style(f"pubkey used is: {pubkey}", fg="magenta", bold=False))
-            click.echo(click.style("File encrypted successfully!", fg="green", bold=True))
+        click.echo(click.style("File encrypted successfully!", fg="green", bold=True))
     except Exception as e:
-        click.echo(click.style(f"Houston, we have a problem: {e}", fg="red", bold=True))
+        click.echo(click.style(f"Houston, we have a problem: {e}, {type(e)}", fg="red", bold=True))
         sys.exit(2)
 
 
 @cli.command()
 @click.argument('file', required=True)
 @click.option('--privkey', default="my_key", help='(optional) specify the RSA private key')
-@click.option('--remove', is_flag=True, help="(optional, bool=False) to indicate if remove or not the encrypted file")
-@click.option('-s', is_flag=True, help="(optional, bool=False) to indicate destroy file after open")
+@click.option('--remove', '-r', is_flag=True, help="(optional, bool=False) passing this option the encrypted file will"
+                                                   "be removed")
+@click.option('-s', is_flag=True, help="(optional, bool=False) passing this option the decrypted file will"
+                                       "be removed")
 @click.option('--pager', '-p', is_flag=True,
               help="(optional, bool=False) to open or not the pager to read decrypted file")
 @pass_config
@@ -83,18 +92,73 @@ def decrypt(config, file, privkey, remove, s, pager):
         # in case of pubkey is not passed, pycryptex calculates the default path
         if privkey == "my_key":
             privkey = os.path.join(get_home(), '.pycryptex', privkey)
-        f = rsa.decrypt_file(file=file, private_key=privkey, remove=remove)
+            try:
+                f = rsa.decrypt_file(file=file, private_key=privkey, remove=remove)
+            except ValueError as e:
+                # try again to decrypt passing the passprhase
+                passprhase = getpass("Please insert your passprhase: ")
+                # passprhase = input("Please insert your passprhase: ")
+                f = rsa.decrypt_file(file=file, private_key=privkey, remove=remove, passprhase=passprhase)
+
         # open file in a pager
         if pager:
-            output = subprocess.run([pycryptex.config_file['config']['pager'], f])
-        # if True delete the decrypted file
-        if s:
-            os.remove(f)
+            exit_code = subprocess.call([pycryptex.config_file['config']['pager'], f])
+            if exit_code == 0:
+                # if True delete the decrypted file
+                time.sleep(pycryptex.config_file['config']['wait_delete_time'])
+                if s:
+                    os.remove(f)
+            else:
+                click.echo(click.style(f"Houston, we have a problem: the opened subprocess has a return value equal to"
+                                       f" {exit_code}", fg="red", bold=True))
         if config.verbose:
             click.echo(click.style(f"priv_key used is: {privkey}", fg="magenta", bold=False))
-            click.echo(click.style("File decrypted successfully!", fg="green", bold=True))
+        click.echo(click.style("File decrypted successfully!", fg="green", bold=True))
+    except ValueError as e:
+        click.echo(click.style(f"Houston, we have a problem: it is possible that you use the wrong key file to decrypt "
+                               f"the document or that the passprhase is incorrect. \nTry with the private key "
+                               f"corresponding to the public key used to encrypt the file.", fg="red", bold=True))
+        sys.exit(2)
     except Exception as e:
-        click.echo(click.style(f"Houston, we have a problem: {e}", fg="red", bold=True))
+        click.echo(click.style(f"Houston, we have a problem: {e}, {type(e)}", fg="red", bold=True))
+        sys.exit(2)
+
+
+@cli.command()
+@pass_config
+def create_keys(config):
+    """
+    Create a public and private key pair into the
+    '$HOME/.pycryptex' folder.
+    """
+    try:
+        # does keys exist in the target folder?
+        home = Path.home()
+        pycryptex_folder = os.path.join(home, '.pycryptex')
+        if os.path.exists(os.path.join(pycryptex_folder, 'my_key')) or \
+                os.path.exists(os.path.join(pycryptex_folder, 'my_key.pub')):
+            click.echo(click.style(
+                "[PAY ATTENTION]\n"
+                "The standard keys are present into the default .pycryptex folder. If you confirm to proceed and\n"
+                "you already have some document encrypted, you will not be able to open them (if you haven't also copied\n"
+                "keys in another location!)", fg="red", bold=True))
+
+        answer = input(f"Do you confirm keys creation into {pycryptex_folder}? (y/n)")
+        if answer in ('y', 'yes'):
+            answer = input(f"To make your password more secure, do you like to add a passprhase? (y/n)")
+            passprhase = None
+            if answer in ('y', 'yes'):
+                passprhase = getpass("Please insert your passprhase: ")
+                # passprhase = input("Please insert your passprhase: ")
+            # creation of the keys
+            rsa.create_keys(pycryptex_folder, passprhase)
+            click.echo(
+                click.style("New keys created successfully! Now you can use the other commands, happy encryption!",
+                            fg="green", bold=True))
+        else:
+            click.echo("Keys creation aborted by the user")
+    except Exception as e:
+        click.echo(click.style(f"Houston, we have a problem during the creation of the keys: {e}", fg="red", bold=True))
         sys.exit(2)
 
 
@@ -114,5 +178,5 @@ def read_config():
                 }
             }
     except Exception as e:
-        print("Houston, we have a problem in read_config: ", e)
+        click.echo(click.style(f"Houston, we have a problem in read_config: {e}", fg="red", bold=True))
         sys.exit(1)
