@@ -54,13 +54,18 @@ setup(
     # package_dir={'': 'pycryptex'},
     packages=setuptools.find_packages(),
     install_requires=[
-        'CLick',
-        'pycryptodome',
+        'click==7.1.2',
+        'pycryptodome==3.9.8',
     ],
     entry_points='''
         [console_scripts]
         pycryptex=pycryptex.main:cli
     ''',
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
 )
 
 _post_install()
