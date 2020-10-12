@@ -49,7 +49,8 @@ def cli(config, verbose):
 @cli.command()
 @click.argument('file', required=True)
 @click.option('--pubkey', default="my_key.pub", help='(optional) specify the RSA public key')
-@click.option('--remove', '-r', is_flag=True, help="(optional, bool=False) to indicate if remove or not the file")
+@click.option('--remove', '-r', is_flag=True, help="(optional, bool=False) to indicate if remove or not the "
+                                                   "original clear file")
 @pass_config
 def encrypt(config, file, pubkey, remove):
     """Encrypt a file"""
