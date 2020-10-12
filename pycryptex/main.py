@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+from getpass import getpass
 from pathlib import Path
 from pycryptex.crypto import rsa
 import pycryptex
@@ -94,7 +95,8 @@ def decrypt(config, file, privkey, remove, s, pager):
                 f = rsa.decrypt_file(file=file, private_key=privkey, remove=remove)
             except ValueError as e:
                 # try again to decrypt passing the passprhase
-                passprhase = input("Please insert your passprhase: ")
+                passprhase = getpass("Please insert your passprhase: ")
+                # passprhase = input("Please insert your passprhase: ")
                 f = rsa.decrypt_file(file=file, private_key=privkey, remove=remove, passprhase=passprhase)
 
         # open file in a pager
@@ -137,15 +139,16 @@ def create_keys(config):
             click.echo(click.style(
                 "[PAY ATTENTION]\n"
                 "The standard keys are present into the default .pycryptex folder. If you confirm to proceed and\n"
-                "you already have some document encrypted, you will not be able to open them (if you haven't copied\n"
-                "keys in another location!", fg="red", bold=True))
+                "you already have some document encrypted, you will not be able to open them (if you haven't also copied\n"
+                "keys in another location!)", fg="red", bold=True))
 
         answer = input(f"Do you confirm keys creation into {pycryptex_folder}? (y/n)")
         if answer in ('y', 'yes'):
-            answer = input(f"To robust your key, do you need to add a passprhase? (y/n)")
+            answer = input(f"To make your password more secure, do you like to add a passprhase? (y/n)")
             passprhase = None
             if answer in ('y', 'yes'):
-                passprhase = input("Please insert your passprhase: ")
+                passprhase = getpass("Please insert your passprhase: ")
+                # passprhase = input("Please insert your passprhase: ")
             # creation of the keys
             rsa.create_keys(pycryptex_folder, passprhase)
             click.echo(

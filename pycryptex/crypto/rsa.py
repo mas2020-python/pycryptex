@@ -128,10 +128,8 @@ def create_keys(folder: str, passprhase=None):
     if passprhase:
         private_key = key.export_key(passphrase=passprhase, pkcs=8,
                                      protection="scryptAndAES128-CBC")
-        print("pk with passprhase")
     else:
         private_key = key.export_key()
-        print("pk with NO passprhase")
 
     with open(os.path.join(folder, "my_key"), "wb") as file_out:
         file_out.write(private_key)
