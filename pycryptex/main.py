@@ -2,14 +2,12 @@ import os
 import subprocess
 import sys
 from getpass import getpass
-from pathlib import Path
 from pycryptex.crypto import rsa
 import pycryptex
 from os import path
 import time
 import click
-import toml
-
+from pycryptex import utils
 
 class Config():
     """
@@ -40,8 +38,6 @@ def cli(config, verbose):
     Using config.verbose is possible to pass verbose from a command to another
     """
     config.verbose = verbose
-    # load config file
-    read_config()
     if verbose:
         click.echo(click.style(f"config_file loaded: {pycryptex.config_file}", fg="magenta", bold=True))
 
@@ -57,7 +53,7 @@ def encrypt(config, file, pubkey, remove):
     try:
         # in case of pubkey is not passed, pycryptex calculates the default path
         if pubkey == "my_key.pub":
-            pubkey = os.path.join(get_home(), '.pycryptex', pubkey)
+            pubkey = os.path.join(utils.get_home(), '.pycryptex', pubkey)
         # check if pubkey exists
         if not path.exists(pubkey):
             click.echo(
@@ -70,7 +66,7 @@ def encrypt(config, file, pubkey, remove):
         rsa.encrypt_file(file=file, public_key=pubkey, remove=remove)
         if config.verbose:
             click.echo(click.style(f"pubkey used is: {pubkey}", fg="magenta", bold=False))
-        click.echo(click.style("File encrypted successfully!", fg="green", bold=True))
+        click.echo(click.style("👍 File encrypted successfully!", fg="green", bold=True))
     except Exception as e:
         click.echo(click.style(f"Houston, we have a problem: {e}, {type(e)}", fg="red", bold=True))
         sys.exit(2)
@@ -89,19 +85,21 @@ def encrypt(config, file, pubkey, remove):
 def decrypt(config, file, privkey, remove, s, pager):
     """Decrypt a file"""
     try:
+        f = ""
         # in case of pubkey is not passed, pycryptex calculates the default path
         if privkey == "my_key":
-            privkey = os.path.join(get_home(), '.pycryptex', privkey)
+            privkey = os.path.join(utils.get_home(), '.pycryptex', privkey)
             try:
                 f = rsa.decrypt_file(file=file, private_key=privkey, remove=remove)
             except ValueError as e:
                 # try again to decrypt passing the passprhase
                 passprhase = getpass("Please insert your passprhase: ")
-                # passprhase = input("Please insert your passprhase: ")
                 f = rsa.decrypt_file(file=file, private_key=privkey, remove=remove, passprhase=passprhase)
 
         # open file in a pager
         if pager:
+            # load config file first
+            utils.read_config()
             exit_code = subprocess.call([pycryptex.config_file['config']['pager'], f])
             if exit_code == 0:
                 # if True delete the decrypted file
@@ -113,7 +111,7 @@ def decrypt(config, file, privkey, remove, s, pager):
                                        f" {exit_code}", fg="red", bold=True))
         if config.verbose:
             click.echo(click.style(f"priv_key used is: {privkey}", fg="magenta", bold=False))
-        click.echo(click.style("File decrypted successfully!", fg="green", bold=True))
+        click.echo(click.style(f"File decrypted successfully in {f}!", fg="green", bold=True))
     except ValueError as e:
         click.echo(click.style(f"Houston, we have a problem: it is possible that you use the wrong key file to decrypt "
                                f"the document or that the passprhase is incorrect. \nTry with the private key "
@@ -133,8 +131,9 @@ def create_keys(config):
     """
     try:
         # does keys exist in the target folder?
-        home = Path.home()
-        pycryptex_folder = os.path.join(home, '.pycryptex')
+        is_created, pycryptex_folder = utils.create_home_folder()
+        if is_created:
+            click.echo(click.style(f"👍 .pycryptex folder created in: {pycryptex_folder}", fg="green", bold=False))
         if os.path.exists(os.path.join(pycryptex_folder, 'my_key')) or \
                 os.path.exists(os.path.join(pycryptex_folder, 'my_key.pub')):
             click.echo(click.style(
@@ -162,21 +161,3 @@ def create_keys(config):
         sys.exit(2)
 
 
-def get_home() -> str:
-    return str(Path.home())
-
-
-def read_config():
-    try:
-        config_path = os.path.join(get_home(), '.pycryptex', 'pycryptex.toml')
-        if path.exists(config_path):
-            pycryptex.config_file = toml.load(config_path)
-        else:
-            pycryptex.config_file = {
-                "config": {
-                    'pager': 'vim'
-                }
-            }
-    except Exception as e:
-        click.echo(click.style(f"Houston, we have a problem in read_config: {e}", fg="red", bold=True))
-        sys.exit(1)
