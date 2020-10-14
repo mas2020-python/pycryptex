@@ -13,7 +13,7 @@ setup(
     name="pycryptex",
     author="mas2020",
     author_email="andrea.genovesi@gmail.com",
-    version="0.3.0.dev1",
+    version="0.3.0.dev2",
     url="https://github.com/mas2020-python/pycryptex",
     description="Python CLI application to easily encrypt and decrypt file and folders. Easy and fast for the lovers"
                 "of the CLI.",
