@@ -9,3 +9,12 @@ def test_encrypt():
     assert result.exit_code == 0
     print(result.exit_code)
     assert not result.exception
+
+def test_decrypt():
+    runner = CliRunner()
+    result = runner.invoke(cli,
+                           ['decrypt', '--privkey', '/Users/andrea.genovesi/.ssh/keys/id_rsa',
+                            '/Users/andrea.genovesi/ganttproject.log.enc'])
+    assert result.exit_code == 0
+    print(result.exit_code)
+    assert not result.exception

@@ -79,16 +79,16 @@ Follow the list of commands:
 Some basic example usages are:
 ````shell script
 # to encrypt passing a key
-pycryptex encrypt --pubkey keys/my_key.pub test/secret.txt
+pycryptex encrypt --pubkey test/id_rsa.pub test/secrets.txt
 
 # to encrypt using the my_key.pub in $HOME/.pycryptex folder
 pycryptex encrypt test/secret.txt
 
 # to decrypt and delete the encrypted file
-pycryptex --verbose decrypt --privkey keys/my_key  --remove test/secrets.txt.enc
+pycryptex --verbose decrypt --privkey test/id_rsa  --remove test/secrets.txt.enc
 
 # decrypt, open the pager and then delete the decrypted file
-pycryptex --verbose decrypt --privkey keys/my_key  -s -p  test/secrets.txt.enc
+pycryptex --verbose decrypt --privkey test/id_rsa -s -p  test/secrets.txt.enc
 
 # decrypt, open the pager and then delete the decrypted file (loading keys from $HOME/.pycryptex)
 pycryptex decrypt -sp test/secrets.txt.enc
