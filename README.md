@@ -10,6 +10,7 @@ If you want to contribute to that project, after cloning the repo type:
 python3 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip
+pip install --upgrade setuptools
 pip install -r requirements.txt
 
 # (optional) to test type

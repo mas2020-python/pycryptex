@@ -37,8 +37,7 @@ def create_config() -> bool:
 
     if not os.path.exists(pycryptex_config_file):
         with open(pycryptex_config_file, "w") as f:
-            f.write("""---
-# Configuration file for pycryptex
+            f.write("""# Configuration file for pycryptex
 [config]
 # path to the pager application where to see decrypted file
 pager = "vim"
