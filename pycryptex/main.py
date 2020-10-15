@@ -166,6 +166,26 @@ def create_keys(config):
         sys.exit(2)
 
 
+@cli.command()
+@pass_config
+def create_config(config):
+    """
+    Create the config file in the $HOME/.pycryptex folder if the file doesn't exist
+    """
+    try:
+        if utils.create_config():
+            click.echo(click.style(f"👍 pycryptex.toml file created in: "
+                                   f"{os.path.join(utils.get_home(), '.pycryptex', 'pycryptex.toml')}", fg="green",
+                                   bold=False))
+        else:
+            click.echo(click.style(f"👍 nothing to do, file "
+                                   f"{os.path.join(utils.get_home(), '.pycryptex', 'pycryptex.toml')} already exists!",
+                                   fg="magenta", bold=False))
+    except Exception as e:
+        click.echo(click.style(f"Houston, help: {e}", fg="red", bold=True))
+        sys.exit(2)
+
+
 def echo_invalid_key_msg(missing_path: str, key_name: str):
     click.echo(
         click.style(f"Houston, help: the key is missing in '{missing_path}'", fg="red", bold=False))
