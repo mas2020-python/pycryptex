@@ -74,6 +74,7 @@ Follow the list of commands:
 - `encrypt`: to encrypt a single file
 - `decrypt`: to decrypt a single file
 - `create-keys`: to create a public key and private key pair.
+- `create-config`: to create the default config file under $HOME/.pycryptex/pycryptex.toml
 
 ### Some examples
 Some basic example usages are:
