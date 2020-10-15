@@ -26,6 +26,11 @@ To install the executable package type:
 pip3 install --editable .
 ````
 
+To install from PyPi test (other dependencies packages from official PyPi) type:
+````shell script
+pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple pycryptex==<version>
+````
+
 To test the application type:
 ```shell script
 pytest
