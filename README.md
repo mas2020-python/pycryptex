@@ -10,6 +10,7 @@ If you want to contribute to that project, after cloning the repo type:
 python3 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip
+pip install --upgrade setuptools
 pip install -r requirements.txt
 
 # (optional) to test type
@@ -24,6 +25,11 @@ ssh-keygen -t rsa -b 4096 -C "<your-user>@<your-domain>"
 To install the executable package type:
 ````shell script
 pip3 install --editable .
+````
+
+To install from PyPi test (other dependencies packages from official PyPi) type:
+````shell script
+pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple pycryptex==<version>
 ````
 
 To test the application type:
@@ -45,7 +51,14 @@ You can get help with:
 pycryptex --help
 ````
 
-To encrypt/decrypt some content ``pycryptex`` uses RSA keys pair. The default keys name:
+PyCryptex can encrypt using symmetric or asymmetric algorithms based on the arguments passed.
+To the standard encryption/decryption ``pycryptex`` uses RSA keys pair. In particular encrypt using the public key of the user and decrypt
+using the private key. For better performance ``pycryptex`` behind the scene uses for encryption and decryption the AES algorithm.
+The RSA keys are used to encrypt and decrypt the random key generated and stored as header to the file.
+In this way the performance are definitely better on a large file (a 256 bit AES random key is used).
+
+
+The default keys name:
 - my_key: for the private key
 - my_key.pub: for the public key
 The folder where **`pycryptex`** searches for the key is your $HOME/.pycryptex. If you prefer to use your own
@@ -74,21 +87,22 @@ Follow the list of commands:
 - `encrypt`: to encrypt a single file
 - `decrypt`: to decrypt a single file
 - `create-keys`: to create a public key and private key pair.
+- `create-config`: to create the default config file under $HOME/.pycryptex/pycryptex.toml
 
 ### Some examples
 Some basic example usages are:
 ````shell script
 # to encrypt passing a key
-pycryptex encrypt --pubkey keys/my_key.pub test/secret.txt
+pycryptex encrypt --pubkey test/id_rsa.pub test/secrets.txt
 
 # to encrypt using the my_key.pub in $HOME/.pycryptex folder
 pycryptex encrypt test/secret.txt
 
 # to decrypt and delete the encrypted file
-pycryptex --verbose decrypt --privkey keys/my_key  --remove test/secrets.txt.enc
+pycryptex --verbose decrypt --privkey test/id_rsa  --remove test/secrets.txt.enc
 
 # decrypt, open the pager and then delete the decrypted file
-pycryptex --verbose decrypt --privkey keys/my_key  -s -p  test/secrets.txt.enc
+pycryptex --verbose decrypt --privkey test/id_rsa -s -p  test/secrets.txt.enc
 
 # decrypt, open the pager and then delete the decrypted file (loading keys from $HOME/.pycryptex)
 pycryptex decrypt -sp test/secrets.txt.enc

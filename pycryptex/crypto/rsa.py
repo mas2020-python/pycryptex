@@ -47,7 +47,7 @@ def encrypt_data(clear_data: bytes, public_key: str) -> list:
     return encbytes_out
 
 
-def encrypt_file(file: str, public_key: str, remove=False):
+def encrypt_file(file: str, public_key: str, remove=False) -> str:
     """
     Encrypt the file and create a new file appending .enc.
 
@@ -60,12 +60,13 @@ def encrypt_file(file: str, public_key: str, remove=False):
         # Read all bytes
         clear_bytes = byte_reader.read(-1)
     enc_bytes_list = encrypt_data(clear_bytes, public_key)
-    with open("".join((file, ".enc")), "wb") as f:
+    enc_filename = "".join((file, ".enc"))
+    with open(enc_filename, "wb") as f:
         for b in enc_bytes_list:
             f.write(b)
     if remove:
         os.remove(file)
-
+    return enc_filename
 
 def decrypt_file(file: str, private_key: str, remove=False, passprhase=None):
     """
