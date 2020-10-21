@@ -10,6 +10,7 @@ If you want to contribute to that project, after cloning the repo type:
 python3 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip
+pip install --upgrade setuptools
 pip install -r requirements.txt
 
 # (optional) to test type
@@ -50,7 +51,14 @@ You can get help with:
 pycryptex --help
 ````
 
-To encrypt/decrypt some content ``pycryptex`` uses RSA keys pair. The default keys name:
+PyCryptex can encrypt using symmetric or asymmetric algorithms based on the arguments passed.
+To the standard encryption/decryption ``pycryptex`` uses RSA keys pair. In particular encrypt using the public key of the user and decrypt
+using the private key. For better performance ``pycryptex`` behind the scene uses for encryption and decryption the AES algorithm.
+The RSA keys are used to encrypt and decrypt the random key generated and stored as header to the file.
+In this way the performance are definitely better on a large file (a 256 bit AES random key is used).
+
+
+The default keys name:
 - my_key: for the private key
 - my_key.pub: for the public key
 The folder where **`pycryptex`** searches for the key is your $HOME/.pycryptex. If you prefer to use your own
