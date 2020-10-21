@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.3.0] - 2020-10-21
+
+### Added
+
+- added new command `create-config` to create a template of the pycrytex.toml
+- mask text on user input when a password is requested to decrypt a RSA private key
+
+### Fixed
+- during the reading of auto generated pycryptex.toml file
+- issue when decrypting a file without having the default private key
+
 ## [0.2.0] - 2020-10-12
 
 ### Added
