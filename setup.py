@@ -16,7 +16,7 @@ setup(
     version="0.4.0-dev",
     url="https://github.com/mas2020-python/pycryptex",
     description="Python CLI application to easily encrypt and decrypt file and folders. Easy and fast for the lovers"
-                "of the CLI.",
+                " of the CLI.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     # package_dir={'': 'pycryptex'},
