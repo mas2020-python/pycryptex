@@ -73,12 +73,10 @@ def encrypt(config, file, pubkey, keep):
 @click.option('--privkey', default="", help='(optional) specify the RSA private key')
 @click.option('--keep', '-k', is_flag=True, default=False,
               help="(optional, bool=False) keep the encrypted file on the file system")
-@click.option('-s', is_flag=True, help="(optional, bool=False) passing this option the decrypted file will"
-                                       "be removed (valid only with --pager option)")
 @click.option('--pager', '-p', is_flag=True,
               help="(optional, bool=False) to open or not the pager to read decrypted file")
 @pass_config
-def decrypt(config, file, privkey, keep, s, pager):
+def decrypt(config, file, privkey, keep, pager):
     """Decrypt a file"""
     try:
         f = ""
@@ -100,21 +98,7 @@ def decrypt(config, file, privkey, keep, s, pager):
 
         # open file in a pager
         if pager:
-            # load config file first
-            utils.read_config()
-            if config.verbose:
-                click.echo(click.style(f"config_file loaded: {pycryptex.config_file}", fg="magenta", bold=True))
-            exit_code = subprocess.call([pycryptex.config_file['config']['pager'], f])
-            if exit_code == 0:
-                # if True delete the decrypted file
-                time.sleep(pycryptex.config_file['config']['wait_delete_time'])
-                if s:
-                    os.remove(f)
-                    click.echo(click.style("👍 Decrypted file has been removed successfully!", fg="green", bold=True))
-                    return
-            else:
-                click.echo(click.style(f"Houston, we have a problem: the opened subprocess has a return value equal to"
-                                       f" {exit_code}", fg="red", bold=True))
+            utils.open_pager(config, f)
 
         click.echo(click.style(f"👍 File decrypted successfully in {f}!", fg="green", bold=True))
     except ValueError as e:
