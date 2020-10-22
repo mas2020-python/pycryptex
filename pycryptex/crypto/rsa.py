@@ -56,6 +56,9 @@ def encrypt_file(file: str, public_key: str, remove=False) -> str:
     :param remove: bool to specify if remove original file
     :return: None
     """
+    # if the file name ends with .enc, return ""
+    if file.endswith(".enc"):
+        return ""
     with open(file, 'rb') as byte_reader:
         # Read all bytes
         clear_bytes = byte_reader.read(-1)
@@ -78,6 +81,9 @@ def decrypt_file(file: str, private_key: str, remove=False, passprhase=None):
     :param remove: bool to specify if remove the encrypted file
     :return: the name of the file that has been decrypted
     """
+    # if the file name ends with .enc, return ""
+    if not file.endswith(".enc"):
+        return ""
     with open(file, 'rb') as byte_reader:
         # Read all bytes
         enc_bytes = byte_reader.read(-1)

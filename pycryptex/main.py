@@ -7,6 +7,7 @@ import pycryptex
 from os import path
 import time
 import click
+from tqdm import tqdm
 from pycryptex import utils
 
 
@@ -57,16 +58,28 @@ def encrypt(config, file, pubkey, keep):
         if not path.exists(pubkey):
             echo_invalid_key_msg(pubkey, "pubkey")
             return
-        # encryption of the file
-        f = rsa.encrypt_file(file=file, public_key=pubkey, remove=not keep)
+        # check if the file param is a file or a dir
+        if os.path.isdir(file):
+            click.echo(click.style(f"Taking a look at the number of files...", fg="white", bold=True))
+            total = utils.count_file(file)
+            click.echo(click.style(f"Number of files to encrypt are: {total}", fg="magenta", bold=True))
+            with tqdm(total=total, desc='encryption state') as pbar:
+                for root, dir_names, file_names in os.walk(file):
+                    for f in file_names:
+                        enc_file = rsa.encrypt_file(file=os.path.join(root, f), public_key=pubkey, remove=not keep)
+                        pbar.update(1)
+            click.echo(click.style(f"👍 Folder encrypted successfully!", fg="green", bold=True))
+        else:
+            # encryption of the file
+            f = rsa.encrypt_file(file=file, public_key=pubkey, remove=not keep)
+            click.echo(click.style(f"👍 File encrypted successfully in {f}", fg="green", bold=True))
+
         if config.verbose:
             click.echo(click.style(f"pubkey used is: {pubkey}", fg="magenta", bold=False))
             click.echo(click.style(f"config_file loaded: {pycryptex.config_file}", fg="magenta", bold=True))
-        click.echo(click.style(f"👍 File encrypted successfully in {f}", fg="green", bold=True))
     except Exception as e:
         click.echo(click.style(f"Houston, help: {e}, {type(e)}", fg="red", bold=True))
         sys.exit(2)
-
 
 @cli.command()
 @click.argument('file', required=True)
@@ -95,11 +108,23 @@ def decrypt(config, file, privkey, keep, pager):
             passprhase = getpass("Please insert your passprhase: ")
         f = rsa.decrypt_file(file=file, private_key=privkey, remove=not keep, passprhase=passprhase)
 
-        # open file in a pager
-        if pager:
-            utils.open_pager(config, f)
+        if os.path.isdir(file):
+            click.echo(click.style(f"Taking a look at the number of files...", fg="white", bold=True))
+            total = utils.count_file(file)
+            click.echo(click.style(f"Number of files to decrypt are: {total}", fg="magenta", bold=True))
+            with tqdm(total=total, desc='decryption state') as pbar:
+                for root, dir_names, file_names in os.walk(file):
+                    for f in file_names:
+                        rsa.decrypt_file(file=file, private_key=privkey, remove=not keep, passprhase=passprhase)
+                        pbar.update(1)
+            click.echo(click.style(f"👍 Folder decrypted successfully!", fg="green", bold=True))
+        else:
+            f = rsa.decrypt_file(file=file, private_key=privkey, remove=not keep)
+            click.echo(click.style(f"👍 File decrypted successfully in {f}!", fg="green", bold=True))
+            # open file in a pager
+            if pager:
+                utils.open_pager(config, f)
 
-        click.echo(click.style(f"👍 File decrypted successfully in {f}!", fg="green", bold=True))
     except ValueError as e:
         click.echo(click.style(f"Houston, help: it is possible that you use the wrong key file to decrypt "
                                f"the document or that the passprhase is incorrect. \nTry with the private key "
