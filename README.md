@@ -37,6 +37,13 @@ To test the application type:
 pytest
 ```
 
+To deploy on PyPi test:
+```shell script
+python3 setup.py bdist_wheel sdist
+twine upload dist/* --repository testpypi
+```
+You need to have the credentials or token from the owner of the project on PyPi.
+
 ## Install application
 
 If you like pycryptex and you want to use simply type:
