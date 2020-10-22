@@ -107,6 +107,6 @@ pycryptex --verbose decrypt --privkey test/id_rsa -s -p  test/secrets.txt.enc
 # decrypt, open the pager and then delete the decrypted file (loading keys from $HOME/.pycryptex)
 pycryptex decrypt -sp test/secrets.txt.enc
 
-# to create private and public key pair
+# to create private/public key pairs
 pycryptex create-keys
 ````

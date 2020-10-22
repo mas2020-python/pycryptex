@@ -44,10 +44,10 @@ def cli(config, verbose):
 @cli.command()
 @click.argument('file', required=True)
 @click.option('--pubkey', default="", help='(optional) specify the RSA public key')
-@click.option('--remove', '-r', is_flag=True, help="(optional, bool=False) to indicate if remove or not the "
-                                                   "original clear file")
+@click.option('--keep', '-k', is_flag=True, default=False,
+              help="(optional, bool=False) keep the original file on the file system")
 @pass_config
-def encrypt(config, file, pubkey, remove):
+def encrypt(config, file, pubkey, keep):
     """Encrypt a file"""
     try:
         # in case of pubkey is not passed, pycryptex calculates the default path
@@ -58,7 +58,7 @@ def encrypt(config, file, pubkey, remove):
             echo_invalid_key_msg(pubkey, "pubkey")
             return
         # encryption of the file
-        f = rsa.encrypt_file(file=file, public_key=pubkey, remove=remove)
+        f = rsa.encrypt_file(file=file, public_key=pubkey, remove=not keep)
         if config.verbose:
             click.echo(click.style(f"pubkey used is: {pubkey}", fg="magenta", bold=False))
             click.echo(click.style(f"config_file loaded: {pycryptex.config_file}", fg="magenta", bold=True))
@@ -71,14 +71,14 @@ def encrypt(config, file, pubkey, remove):
 @cli.command()
 @click.argument('file', required=True)
 @click.option('--privkey', default="", help='(optional) specify the RSA private key')
-@click.option('--remove', '-r', is_flag=True, help="(optional, bool=False) passing this option the encrypted file will"
-                                                   "be removed")
+@click.option('--keep', '-k', is_flag=True, default=False,
+              help="(optional, bool=False) keep the encrypted file on the file system")
 @click.option('-s', is_flag=True, help="(optional, bool=False) passing this option the decrypted file will"
                                        "be removed (valid only with --pager option)")
 @click.option('--pager', '-p', is_flag=True,
               help="(optional, bool=False) to open or not the pager to read decrypted file")
 @pass_config
-def decrypt(config, file, privkey, remove, s, pager):
+def decrypt(config, file, privkey, keep, s, pager):
     """Decrypt a file"""
     try:
         f = ""
@@ -92,11 +92,11 @@ def decrypt(config, file, privkey, remove, s, pager):
             echo_invalid_key_msg(privkey, "privkey")
             return
         try:
-            f = rsa.decrypt_file(file=file, private_key=privkey, remove=remove)
+            f = rsa.decrypt_file(file=file, private_key=privkey, remove=not keep)
         except ValueError as e:
             # try again to decrypt passing the passprhase
             passprhase = getpass("Please insert your passprhase: ")
-            f = rsa.decrypt_file(file=file, private_key=privkey, remove=remove, passprhase=passprhase)
+            f = rsa.decrypt_file(file=file, private_key=privkey, remove=not keep, passprhase=passprhase)
 
         # open file in a pager
         if pager:
