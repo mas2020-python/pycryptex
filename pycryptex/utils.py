@@ -4,6 +4,8 @@ Utils module for repetitive jobs.
 import os
 import sys
 from pathlib import Path
+import subprocess
+import time
 import pycryptex
 from os import path
 import toml
@@ -62,3 +64,14 @@ def read_config():
     except Exception as e:
         click.echo(click.style(f"Houston, we have a problem in read_config: {e}", fg="red", bold=True))
         sys.exit(1)
+
+
+def open_pager(config, f: str):
+    # load config file first
+    read_config()
+    if config.verbose:
+        click.echo(click.style(f"config_file loaded: {pycryptex.config_file}", fg="magenta", bold=True))
+    exit_code = subprocess.call([pycryptex.config_file['config']['pager'], f])
+    if exit_code != 0:
+        click.echo(click.style(f"Houston, we have a problem: the opened subprocess has a return value equal to"
+                               f" {exit_code}", fg="red", bold=True))
