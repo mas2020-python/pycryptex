@@ -1,5 +1,5 @@
 """
-This module shows an example of encrypt and decrypt using RSA algorithm.
+This module is useful to encrypt and decrypt using RSA algorithm.
 """
 import os
 from pathlib import Path

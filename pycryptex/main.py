@@ -9,7 +9,7 @@ import time
 import click
 from tqdm import tqdm
 from pycryptex import utils
-
+from pycryptex.utils import timer
 
 class Config():
     """
@@ -90,6 +90,7 @@ def encrypt(config, file, pubkey, keep, no_nested):
 @click.option('--no-nested', is_flag=True, default=False,
               help="(optional, bool=False) in case FILE is a folder, pass it to avoid decrypting the nested folders")
 @pass_config
+@timer
 def decrypt(config, file, privkey, keep, pager, no_nested):
     """Decrypt a file"""
     try:
