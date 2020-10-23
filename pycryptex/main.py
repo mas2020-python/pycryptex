@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import sys
 from getpass import getpass
-from pycryptex.crypto import rsa
+from pycryptex.crypto.rsa import RSACryptex
 import pycryptex
 from os import path
 import time
@@ -65,6 +65,7 @@ def encrypt(config, file, pubkey, keep, no_nested):
             encrypt_decrypt_folder(True, file=file, key=pubkey, keep=keep, no_nested=no_nested)
             click.echo(click.style(f"👍 Folder encrypted successfully!", fg="green", bold=True))
         else:
+            rsa: RSACryptex = RSACryptex()
             # encryption of the file
             f, done = rsa.encrypt_file(file=file, public_key=pubkey, remove=not keep)
             if done:
@@ -104,9 +105,10 @@ def decrypt(config, file, privkey, keep, pager, no_nested):
         if not path.exists(privkey):
             echo_invalid_key_msg(privkey, "privkey")
             return
+
         # check if the private key has a password
         passprhase = None
-        if rsa.is_privatekey_protected(privkey):
+        if RSACryptex.is_privatekey_protected(privkey):
             passprhase = getpass("Please insert your passprhase: ")
 
         if os.path.isdir(file):
@@ -114,6 +116,7 @@ def decrypt(config, file, privkey, keep, pager, no_nested):
                                    no_nested=no_nested)
             click.echo(click.style(f"👍 Folder decrypted successfully!", fg="green", bold=True))
         else:  # single file case
+            rsa: RSACryptex = RSACryptex()
             f, done = rsa.decrypt_file(file=file, private_key=privkey, remove=not keep, passprhase=passprhase)
             if done:
                 click.echo(click.style(f"👍 File decrypted successfully in {f}!", fg="green", bold=True))
@@ -126,7 +129,7 @@ def decrypt(config, file, privkey, keep, pager, no_nested):
     except ValueError as e:
         click.echo(click.style(f"Houston, help: it is possible that you use the wrong key file to decrypt "
                                f"the document or that the passprhase is incorrect. \nTry with the private key "
-                               f"corresponding to the public key used to encrypt the file.", fg="red", bold=True))
+                               f"corresponding to the public key used to encrypt the file: {e}", fg="red", bold=True))
         sys.exit(2)
     except Exception as e:
         click.echo(click.style(f"● Houston, help: {e}, {type(e)}", fg="red", bold=True))
@@ -163,7 +166,7 @@ def create_keys(config):
                 if passprhase != passprhase2:
                     raise Exception('passwords doesn\'t match!')
             # creation of the keys
-            rsa.create_keys(pycryptex_folder, passprhase)
+            RSACryptex.create_keys(pycryptex_folder, passprhase)
             click.echo(
                 click.style("New keys created successfully! Now you can use the other commands, happy encryption!",
                             fg="green", bold=True))
@@ -217,6 +220,7 @@ def encrypt_decrypt_folder(is_encrypt: bool, file: str, key: str, keep: bool,
     click.echo(click.style(f"● Collecting folder files...", fg="magenta", bold=True))
     total = utils.count_file(file, no_nested)
     click.echo(click.style(f"Number of files read in {file} are: {total}", fg="white", bold=True))
+    rsa: RSACryptex = RSACryptex()
     with tqdm(total=total, desc='encryption state' if is_encrypt else 'decryption state') as pbar:
         # in case of no_nested uses the simple read of the first level directory, otherwise walks into all the
         # nested levels
