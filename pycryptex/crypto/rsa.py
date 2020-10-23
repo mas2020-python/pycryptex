@@ -47,7 +47,7 @@ def encrypt_data(clear_data: bytes, public_key: str) -> list:
     return encbytes_out
 
 
-def encrypt_file(file: str, public_key: str, remove=False) -> str:
+def encrypt_file(file: str, public_key: str, remove=False) -> (str, bool):
     """
     Encrypt the file and create a new file appending .enc.
 
@@ -56,20 +56,23 @@ def encrypt_file(file: str, public_key: str, remove=False) -> str:
     :param remove: bool to specify if remove original file
     :return: None
     """
+    # if the file name ends with .enc, return ""
+    if file.endswith(".pycpx"):
+        return file, False
     with open(file, 'rb') as byte_reader:
         # Read all bytes
         clear_bytes = byte_reader.read(-1)
     enc_bytes_list = encrypt_data(clear_bytes, public_key)
-    enc_filename = "".join((file, ".enc"))
+    enc_filename = "".join((file, ".pycpx"))
     with open(enc_filename, "wb") as f:
         for b in enc_bytes_list:
             f.write(b)
     if remove:
         os.remove(file)
-    return enc_filename
+    return enc_filename, True
 
 
-def decrypt_file(file: str, private_key: str, remove=False, passprhase=None):
+def decrypt_file(file: str, private_key: str, remove=False, passprhase=None) -> (str, bool):
     """
     Decrypt the file passed as argument and create a new file removing the .enc extension.
 
@@ -78,15 +81,18 @@ def decrypt_file(file: str, private_key: str, remove=False, passprhase=None):
     :param remove: bool to specify if remove the encrypted file
     :return: the name of the file that has been decrypted
     """
+    # if the file name ends with .enc, return ""
+    if not file.endswith(".pycpx"):
+        return file, False
     with open(file, 'rb') as byte_reader:
         # Read all bytes
         enc_bytes = byte_reader.read(-1)
     clear_bytes_list = decrypt_data(enc_bytes, private_key, passprhase)
-    with open(file[:-4], "wb") as f:
+    with open(file[:-6], "wb") as f:
         f.write(clear_bytes_list)
     if remove:
         os.remove(file)
-    return file[:-4]
+    return file[:-6], True
 
 
 def decrypt_data(enc_data: bytes, private_key: str, passprhase=None) -> bytes:

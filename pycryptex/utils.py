@@ -4,6 +4,7 @@ Utils module for repetitive jobs.
 import os
 import sys
 from pathlib import Path
+from pathlib import PosixPath
 import subprocess
 import time
 import pycryptex
@@ -75,3 +76,25 @@ def open_pager(config, f: str):
     if exit_code != 0:
         click.echo(click.style(f"Houston, we have a problem: the opened subprocess has a return value equal to"
                                f" {exit_code}", fg="red", bold=True))
+
+
+def count_file(path, no_nested: bool) -> int:
+    """
+    Count the file in a folder and its nested folders
+    :param path: directory where begins to count
+    :return: total files number
+    """
+    i = 0
+    if no_nested:
+        currentDirectory = Path(path)
+        for currentFile in currentDirectory.iterdir():
+            if currentFile.is_file():
+                i += 1
+        return i
+    else:
+        for root, d_names, f_names in os.walk(path):
+            for f in f_names:
+                i += 1
+        return i
+
+
