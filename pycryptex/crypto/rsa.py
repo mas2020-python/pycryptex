@@ -68,6 +68,7 @@ def encrypt_file(file: str, public_key: str, remove=False) -> str:
         os.remove(file)
     return enc_filename
 
+
 def decrypt_file(file: str, private_key: str, remove=False, passprhase=None):
     """
     Decrypt the file passed as argument and create a new file removing the .enc extension.
@@ -138,3 +139,14 @@ def create_keys(folder: str, passprhase=None):
     public_key = key.publickey().export_key()
     with open(os.path.join(folder, "my_key.pub"), "wb") as file_out:
         file_out.write(public_key)
+
+
+def is_privatekey_protected(key_file: str) -> bool:
+    try:
+        private_key = RSA.import_key(open(key_file).read(), passphrase="")
+        public_key = private_key.publickey().export_key()
+        return False
+    except ValueError as e:
+        return True
+    except Exception as e:
+        raise e

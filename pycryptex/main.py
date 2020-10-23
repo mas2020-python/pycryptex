@@ -89,12 +89,11 @@ def decrypt(config, file, privkey, keep, pager):
         if not path.exists(privkey):
             echo_invalid_key_msg(privkey, "privkey")
             return
-        try:
-            f = rsa.decrypt_file(file=file, private_key=privkey, remove=not keep)
-        except ValueError as e:
-            # try again to decrypt passing the passprhase
+        # check if the private key has a password
+        passprhase = None
+        if rsa.is_privatekey_protected(privkey):
             passprhase = getpass("Please insert your passprhase: ")
-            f = rsa.decrypt_file(file=file, private_key=privkey, remove=not keep, passprhase=passprhase)
+        f = rsa.decrypt_file(file=file, private_key=privkey, remove=not keep, passprhase=passprhase)
 
         # open file in a pager
         if pager:
@@ -102,12 +101,12 @@ def decrypt(config, file, privkey, keep, pager):
 
         click.echo(click.style(f"👍 File decrypted successfully in {f}!", fg="green", bold=True))
     except ValueError as e:
-        click.echo(click.style(f"Houston, we have a problem: it is possible that you use the wrong key file to decrypt "
+        click.echo(click.style(f"Houston, help: it is possible that you use the wrong key file to decrypt "
                                f"the document or that the passprhase is incorrect. \nTry with the private key "
                                f"corresponding to the public key used to encrypt the file.", fg="red", bold=True))
         sys.exit(2)
     except Exception as e:
-        click.echo(click.style(f"Houston, we have a problem: {e}, {type(e)}", fg="red", bold=True))
+        click.echo(click.style(f"Houston, help: {e}, {type(e)}", fg="red", bold=True))
         sys.exit(2)
 
 
