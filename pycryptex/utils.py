@@ -98,9 +98,11 @@ def count_file(path, no_nested: bool) -> int:
                 i += 1
         return i
 
+
 # Decorator to measure the time spent for a function
 def timer(func):
     """Print the runtime of the decorated function"""
+
     @functools.wraps(func)
     def wrapper_timer(*args, **kwargs):
         start_time = time.perf_counter()
@@ -109,5 +111,5 @@ def timer(func):
         run_time = end_time - start_time
         print(f"Finished {func.__name__!r} in {run_time:.4f} secs")
         return value
-    return wrapper_timer
 
+    return wrapper_timer

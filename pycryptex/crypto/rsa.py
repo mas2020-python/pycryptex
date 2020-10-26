@@ -44,55 +44,10 @@ class RSACryptex:
         # Encrypt the data with the AES session key
         cipher_aes = AES.new(self.session_key, AES.MODE_EAX)
         ciphertext, tag = cipher_aes.encrypt_and_digest(clear_data)
+        encbytes_out = bytearray()
         for x in (self.enc_session_key, cipher_aes.nonce, tag, ciphertext):
-            encbytes_out.append(x)
+            encbytes_out.extend(x)
         return encbytes_out
-
-    def encrypt_file(self, file: str, public_key: str, remove=False) -> (str, bool):
-        """
-        Encrypt the file and create a new file appending .enc.
-
-        :param file: file to encrypt
-        :param public_key: RSA key used for encryption
-        :param remove: bool to specify if remove original file
-        :return: None
-        """
-        # if the file name ends with .enc, return ""
-        if file.endswith(".pycpx"):
-            return file, False
-        with open(file, 'rb') as byte_reader:
-            # Read all bytes
-            clear_bytes = byte_reader.read(-1)
-        enc_bytes_list = self.encrypt_data(clear_bytes, public_key)
-        enc_filename = "".join((file, ".pycpx"))
-        with open(enc_filename, "wb") as f:
-            for b in enc_bytes_list:
-                f.write(b)
-        if remove:
-            os.remove(file)
-        return enc_filename, True
-
-    def decrypt_file(self, file: str, private_key: str, remove=False, passprhase=None) -> (str, bool):
-        """
-        Decrypt the file passed as argument and create a new file removing the .enc extension.
-
-        :param file: encrypted file to decrypt
-        :param private_key: RSA private key used for decryption
-        :param remove: bool to specify if remove the encrypted file
-        :return: the name of the file that has been decrypted
-        """
-        # if the file name ends with .enc, return ""
-        if not file.endswith(".pycpx"):
-            return file, False
-        with open(file, 'rb') as byte_reader:
-            # Read all bytes
-            enc_bytes = byte_reader.read(-1)
-        clear_bytes_list = self.decrypt_data(enc_bytes, private_key, passprhase)
-        with open(file[:-6], "wb") as f:
-            f.write(clear_bytes_list)
-        if remove:
-            os.remove(file)
-        return file[:-6], True
 
     def decrypt_data(self, enc_data: bytes, private_key: str, passprhase=None) -> bytes:
         """
