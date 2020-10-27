@@ -164,17 +164,15 @@ def create_keys(config):
                 "you already have some document encrypted, you will not be able to open them (if you haven't also copied\n"
                 "keys in another location!)", fg="red", bold=True))
 
-        answer = input(f"Do you confirm keys creation into {pycryptex_folder}? (y/n) ")
-        if answer in ('y', 'yes'):
-            answer = input(f"To make your password more secure, do you like to add a passprhase? (y/n) ")
-            passprhase = None
-            if answer in ('y', 'yes'):
-                passprhase = getpass("Please insert your passprhase: ")
-                passprhase2 = getpass("Please confirm your passprhase: ")
-                if passprhase != passprhase2:
+        if click.confirm(f"Do you confirm keys creation into {pycryptex_folder}?"):
+            passphrase = None
+            if click.confirm(f"To make your password more secure, do you like to add a passphrase?"):
+                passphrase = getpass("Please insert your passphrase: ")
+                passprhase2 = getpass("Please confirm your passphrase: ")
+                if passphrase != passprhase2:
                     raise Exception('passwords doesn\'t match!')
             # creation of the keys
-            RSACryptex.create_keys(pycryptex_folder, passprhase)
+            RSACryptex.create_keys(pycryptex_folder, passphrase)
             click.echo(
                 click.style("New keys created successfully! Now you can use the other commands, happy encryption!",
                             fg="green", bold=True))
