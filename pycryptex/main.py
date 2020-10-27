@@ -285,13 +285,13 @@ def encrypt_decrypt_folder(func, is_encrypt: bool, folder: str, keep: bool, no_n
 
 
 def encrypt_decrypt_aes(config, file, keep, no_nested, is_encryption: bool):
-    """Encrypt a file using AES encryption"""
+    """Encrypt or decrypt a file using AES encryption"""
     # test first for file/folder existence
     if not utils.is_valid_path(file):
         return
-    passprhase = getpass("Please insert your passphrase: ")
+    passphrase = getpass("Please insert your passphrase: ")
     aes = AESCryptex()
-    # set var for encrytion or decryption
+    # set var for encryption or decryption
     crypto_func = aes.decrypt_data
     crypto_term = "decrypted"
     if is_encryption:
@@ -301,14 +301,14 @@ def encrypt_decrypt_aes(config, file, keep, no_nested, is_encryption: bool):
     # check if the file param is a file or a dir
     if os.path.isdir(file):
         encrypt_decrypt_folder(crypto_func, is_encryption, folder=file, keep=keep, no_nested=no_nested,
-                               pwd=passprhase)
+                               pwd=passphrase)
         click.echo(click.style(f"👍 Folder {crypto_term} successfully!", fg="green", bold=True))
     else:
         # encryption/decryption of the file
         if is_encryption:
-            f, done = common.encrypt_file(file, crypto_func, remove=not keep, pwd=passprhase)
+            f, done = common.encrypt_file(file, crypto_func, remove=not keep, pwd=passphrase)
         else:
-            f, done = common.decrypt_file(file, crypto_func, remove=not keep, pwd=passprhase)
+            f, done = common.decrypt_file(file, crypto_func, remove=not keep, pwd=passphrase)
         if done:
             click.echo(click.style(f"👍 File {crypto_term} successfully in {f}", fg="green", bold=True))
         else:
