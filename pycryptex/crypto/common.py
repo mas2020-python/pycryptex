@@ -20,7 +20,7 @@ def encrypt_file(file: str, func, remove=False, **kwargs) -> (str, bool):
         # Read all bytes
         clear_bytes = byte_reader.read(-1)
     # call the func to encrypt and convert the byte arrays into bytes to write on disk
-    enc_bytes_list = bytes(func(clear_bytes, **kwargs))
+    enc_bytes_list = func(clear_bytes, **kwargs)
     enc_filename = "".join((file, ".pycpx"))
     with open(enc_filename, "wb") as f:
         f.write(enc_bytes_list)

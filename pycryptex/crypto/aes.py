@@ -8,7 +8,7 @@ class AESCryptex:
         self.key: bytes = None
         self.salt: bytes = None
 
-    def encrypt_data(self, clear_data: bytes, pwd: str) -> list:
+    def encrypt_data(self, clear_data: bytes, pwd: str) -> bytes:
         """
         This example do the following:
         - generate a salt
@@ -28,7 +28,7 @@ class AESCryptex:
         encbytes_out = bytearray()
         for x in (self.salt, cipher_aes.nonce, tag, ciphered_data):
             encbytes_out.extend(x)
-        return encbytes_out
+        return bytes(encbytes_out)
 
     def decrypt_data(self, enc_data: bytes, pwd: str) -> bytes:
         """

@@ -14,7 +14,7 @@ class RSACryptex:
         self.cipher_rsa = None
         self.enc_session_key = None
 
-    def encrypt_data(self, clear_data: bytes, public_key: str) -> list:
+    def encrypt_data(self, clear_data: bytes, public_key: str) -> bytes:
         """
         This example do the following:
         - read the public key
@@ -47,7 +47,7 @@ class RSACryptex:
         encbytes_out = bytearray()
         for x in (self.enc_session_key, cipher_aes.nonce, tag, ciphertext):
             encbytes_out.extend(x)
-        return encbytes_out
+        return bytes(encbytes_out)
 
     def decrypt_data(self, enc_data: bytes, private_key: str, passprhase=None) -> bytes:
         """
