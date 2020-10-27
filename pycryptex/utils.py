@@ -113,3 +113,10 @@ def timer(func):
         return value
 
     return wrapper_timer
+
+def is_valid_path(path) -> bool:
+    # test first for file existence
+    if not os.path.exists(path):
+        click.echo(click.style(f"👍 Nothing to do, file or folder {path} doesn't exist!", fg="yellow", bold=False))
+        return False
+    return True

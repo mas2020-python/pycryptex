@@ -54,6 +54,9 @@ def cli(config, verbose):
 @pass_config
 def encrypt(config, file, pubkey, keep, no_nested):
     """Encrypt files or folders using RSA/AES algorithms"""
+    # test first for file/folder existence
+    if not utils.is_valid_path(file):
+        return
     try:
         # in case of pubkey is not passed, pycryptex calculates the default path
         if len(pubkey) == 0:
@@ -96,6 +99,9 @@ def encrypt(config, file, pubkey, keep, no_nested):
 @pass_config
 def decrypt(config, file, privkey, keep, pager, no_nested):
     """Decrypt files or folders using RSA/AES algorithms"""
+    # test first for file/folder existence
+    if not utils.is_valid_path(file):
+        return
     try:
         f = ""
         # in case of pubkey is not passed, pycryptex calculates the default path
@@ -282,6 +288,9 @@ def encrypt_decrypt_folder(func, is_encrypt: bool, folder: str, keep: bool, no_n
 
 def encrypt_decrypt_aes(config, file, keep, no_nested, is_encryption: bool):
     """Encrypt a file using AES encryption"""
+    # test first for file/folder existence
+    if not utils.is_valid_path(file):
+        return
     passprhase = getpass("Please insert your passphrase: ")
     aes = AESCryptex()
     # set var for encrytion or decryption
