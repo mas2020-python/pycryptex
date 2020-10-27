@@ -91,10 +91,12 @@ pycryptex encrypt --help
 ```
 
 Follow the list of commands:
-- `encrypt`: to encrypt a single file
-- `decrypt`: to decrypt a single file
+- `encrypt`: to encrypt a single file or a folder (including sub folders).
+- `decrypt`: to decrypt a single file a single file or a folder (including sub folders).
 - `create-keys`: to create a public key and private key pair.
 - `create-config`: to create the default config file under $HOME/.pycryptex/pycryptex.toml
+- `encrypt-aes`: to encrypt a single file or a folder (including sub folders) using AES algorithm.
+- `decrypt-aes`: to decrypt a single file a single file or a folder (including sub folders) using AES algorithm.
 
 ### Some examples
 Some basic example usages are:
@@ -111,8 +113,8 @@ pycryptex --verbose decrypt --privkey test/id_rsa  --remove test/secrets.txt.enc
 # decrypt, open the pager and then delete the decrypted file
 pycryptex --verbose decrypt --privkey test/id_rsa -s -p  test/secrets.txt.enc
 
-# decrypt, open the pager and then delete the decrypted file (loading keys from $HOME/.pycryptex)
-pycryptex decrypt -sp test/secrets.txt.enc
+# decrypt and open the pager (loading keys from $HOME/.pycryptex)
+pycryptex decrypt -p test/secrets.txt.enc
 
 # to create private/public key pairs
 pycryptex create-keys
