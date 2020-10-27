@@ -7,8 +7,8 @@ import pycryptex
 from os import path
 import click
 from tqdm import tqdm
-from pycryptex import utils
-from pycryptex.utils import timer
+from pycryptex.internal import utils
+from pycryptex.internal.decorators import timer, debug
 from pycryptex.crypto import common
 from pycryptex.crypto.aes import AESCryptex
 
