@@ -169,6 +169,7 @@ pytest
 
 To deploy on PyPi test:
 ```shell script
+python3 setup.py check
 python3 setup.py bdist_wheel sdist
 twine upload dist/* --repository testpypi
 ```
