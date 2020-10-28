@@ -147,6 +147,13 @@ pycryptex decrypt -p test/secrets.txt.enc
 # to create private/public key pairs
 pycryptex create-keys
 ````
+To combine decrypt + read a file + encrypt again you can use something as:
+```shell script
+pycryptex decrypt --privkey <YOUR-PATH-TO-PRIVATE-KEY> <FILE.pycypx> \
+&& vim <FILE> && \
+pycryptex encrypt --pubkey <YOUR-PATH-TO-PUBLIC-KEY> <FILE>
+```
+In case your key are in your `pycryptex` HOME folder or set into the `pycryptex.toml` file you can omit to pass them.
 
 ## Configuration for developers
 
