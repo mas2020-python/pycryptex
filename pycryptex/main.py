@@ -59,7 +59,7 @@ def encrypt(config, file, pubkey, keep, no_nested):
         return
     try:
         # in case of pubkey is not passed, pycryptex calculates the default path
-        pubkey = load_key(pubkey, 'public-key', 'my_key.pub')
+        pubkey = load_key(pubkey, 'public-key', 'pycryptex_key.pub')
         rsa: RSACryptex = RSACryptex()
         # check if the file param is a file or a dir
         if os.path.isdir(file):
@@ -99,7 +99,7 @@ def decrypt(config, file, privkey, keep, pager, no_nested):
         return
     try:
         f = ""
-        privkey = load_key(privkey, 'private-key', 'my_key')
+        privkey = load_key(privkey, 'private-key', 'pycryptex_key')
         # check if the private key has a password
         passphrase = None
         if RSACryptex.is_privatekey_protected(privkey):
@@ -142,8 +142,8 @@ def create_keys(config):
         is_created, pycryptex_folder = utils.create_home_folder()
         if is_created:
             click.echo(click.style(f"👍 .pycryptex folder created in: {pycryptex_folder}", fg="green", bold=False))
-        if os.path.exists(os.path.join(pycryptex_folder, 'my_key')) or \
-                os.path.exists(os.path.join(pycryptex_folder, 'my_key.pub')):
+        if os.path.exists(os.path.join(pycryptex_folder, 'pycryptex_key')) or \
+                os.path.exists(os.path.join(pycryptex_folder, 'pycryptex_key.pub')):
             click.echo(click.style(
                 "[PAY ATTENTION]\n"
                 "The standard keys are present into the default .pycryptex folder. If you confirm to proceed and\n"
@@ -237,7 +237,7 @@ def load_key(key_path: str, key_config_name: str, key_default: str) -> str:
     :return:
     """
     if len(key_path) == 0:
-        # read config to check if there is a pubkey, else try to load my_key.pub
+        # read config to check if there is a pubkey, else try to load pycryptex_key.pub
         utils.read_config()
         try:
             if len(pycryptex.config_file['config'][key_config_name]) > 0:

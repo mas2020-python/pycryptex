@@ -84,7 +84,7 @@ class RSACryptex:
     def create_keys(cls, folder: str, passprhase=None):
         """
         Create a public key and private key pair
-        :param folder: directory where to create the my_key and my_key.pub files
+        :param folder: directory where to create the pycryptex_key and pycryptex_key.pub files
         :return: None
         """
         key = RSA.generate(2048)
@@ -95,11 +95,11 @@ class RSACryptex:
         else:
             private_key = key.export_key()
 
-        with open(os.path.join(folder, "my_key"), "wb") as file_out:
+        with open(os.path.join(folder, "pycryptex_key"), "wb") as file_out:
             file_out.write(private_key)
 
         public_key = key.publickey().export_key()
-        with open(os.path.join(folder, "my_key.pub"), "wb") as file_out:
+        with open(os.path.join(folder, "pycryptex_key.pub"), "wb") as file_out:
             file_out.write(public_key)
 
     @classmethod

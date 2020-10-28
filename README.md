@@ -45,7 +45,7 @@ pycryptex create-keys
 answer 'yes' and decide if protect the private key with a password (it's your security choice).
 PyCryptex will create the standard key in your *$HOME/.pycryptex* folder.
 
-***IMPORTANT***: you will use your public key (my_key.pub) for encrypt and you private key (my_key) for decrypt. Do not leave the keys in the same place, secure you private key as best as you can, as you do with your private HOME keys ;-)!
+***IMPORTANT***: you will use your public key (pycryptex_key.pub) for encrypt and you private key (pycryptex_key) for decrypt. Do not leave the keys in the same place, secure you private key as best as you can, as you do with your private HOME keys ;-)!
 
 At this point you can simply encrypt a file or a folder using:
 ```shell script
@@ -78,8 +78,8 @@ In this way the performance are definitely better on a large file (a 256 bit AES
 
 
 The default keys name:
-- my_key: for the private key
-- my_key.pub: for the public key
+- pycryptex_key: for the private key
+- pycryptex_key.pub: for the public key
 The folder where **`pycryptex`** searches for the key is your $HOME/.pycryptex. If you prefer to use your own
 keys you can pass them directly as an argument to the encrypt and decrypt method.
 
@@ -90,7 +90,7 @@ An alternative, starting from version 0.4.0, could be save the path of the keys 
 - if the option --privkey or --pubkey is specified, it loads the corresponding file
 - if no option key is specified:
     - if is present privkey or pubkey field in *$HOME/.pycryptex/pycryptex.toml* it loads the corresponding file
-    - loads my_key as private key and my_key.pub located in *$HOME/.pycryptex* directory
+    - loads pycryptex_key as private key and pycryptex_key.pub located in *$HOME/.pycryptex* directory
  
 These rules are not valid when you use `encrypt-aes` and `decrypt-aes` commands that always ask for a console password.
 
@@ -129,10 +129,10 @@ Some basic example usages are:
 # to encrypt passing a key
 pycryptex encrypt --pubkey test/id_rsa.pub test/secrets.txt
 
-# to encrypt using the my_key.pub in $HOME/.pycryptex folder
+# to encrypt using the pycryptex_key.pub in $HOME/.pycryptex folder
 pycryptex encrypt test/secret.txt
 
-# to encrypt using the my_key.pub in $HOME/.pycryptex folder maintaining the original file
+# to encrypt using the pycryptex_key.pub in $HOME/.pycryptex folder maintaining the original file
 pycryptex encrypt test/secret.txt --keep
 
 # decrypt the file
