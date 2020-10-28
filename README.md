@@ -153,7 +153,8 @@ pycryptex decrypt --privkey <YOUR-PATH-TO-PRIVATE-KEY> <FILE.pycypx> \
 && vim <FILE> && \
 pycryptex encrypt --pubkey <YOUR-PATH-TO-PUBLIC-KEY> <FILE>
 ```
-In case your key are in your `pycryptex` HOME folder or set into the `pycryptex.toml` file you can omit to pass them.
+By this way, you can change the clear content also using the right pager, as vim for example.
+In case your keys are in your `pycryptex` HOME folder or set into the `pycryptex.toml` file, you can omit to pass them.
 
 ## Configuration for developers
 
