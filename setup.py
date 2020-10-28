@@ -19,7 +19,7 @@ setup(
                 " of the CLI.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    # package_dir={'': 'pycryptex'},
+    license="MIT",
     packages=setuptools.find_packages(),
     install_requires=[
         'click==7.1.2',
@@ -35,4 +35,5 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    python_requires='>=3.6, <4',
 )
