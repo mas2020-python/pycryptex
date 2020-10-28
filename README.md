@@ -21,7 +21,7 @@ If you are on linux you could have this warning:
 WARNING: The script pycryptex is installed in '/home/<YOUR-HOME>/.local/bin' which is not on PATH.
 ```
 It means that if you type `pycryptex` you get a not found error.
-To solve, simply add the path to your PATH, for example, edit .bashrc in you $HOME folder as (suppose your HOME == vagrant):
+To solve, simply add the path to your PATH, for example, edit .bashrc in your $HOME folder as (suppose your HOME == vagrant):
 ```
 # Add local python bin script to my PATH:
 export PATH=$PATH:/home/vagrant/.local/bin

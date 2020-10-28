@@ -48,9 +48,9 @@ def cli(config, verbose):
 @click.argument('file', required=True)
 @click.option('--pubkey', default="", help='(optional) specify the RSA public key')
 @click.option('--keep', '-k', is_flag=True, default=False,
-              help="(optional, bool=False) if True, do not remove the original file")
+              help="(optional, bool=False) if specified, do not remove the original file")
 @click.option('--no-nested', is_flag=True, default=False,
-              help="(optional, bool=False) in case FILE is a folder, pass it to avoid encrypting the nested folders")
+              help="(optional, bool=False) in case FILE is a folder, specify it to avoid encrypting the nested folders")
 @pass_config
 def encrypt(config, file, pubkey, keep, no_nested):
     """Encrypt files or folders using RSA/AES algorithms"""
@@ -91,11 +91,11 @@ def encrypt(config, file, pubkey, keep, no_nested):
 @click.argument('file', required=True)
 @click.option('--privkey', default="", help='(optional) specify the RSA private key')
 @click.option('--keep', '-k', is_flag=True, default=False,
-              help="(optional, bool=False) if True, do not remove the original file")
+              help="(optional, bool=False) if specified, do not remove the original file")
 @click.option('--pager', '-p', is_flag=True,
               help="(optional, bool=False) open the pager to read decrypted file (only if the FILE arg is a file)")
 @click.option('--no-nested', is_flag=True, default=False,
-              help="(optional, bool=False) in case FILE is a folder, pass it to avoid decrypting the nested folders")
+              help="(optional, bool=False) in case FILE is a folder, specify it to avoid decrypting the nested folders")
 @pass_config
 def decrypt(config, file, privkey, keep, pager, no_nested):
     """Decrypt files or folders using RSA/AES algorithms"""
@@ -207,9 +207,10 @@ def create_config(config):
 @cli.command()
 @click.argument('file', required=True)
 @click.option('--keep', '-k', is_flag=True, default=False,
-              help="(optional, bool=False) if True, do not remove the original file")
+              help="(optional, bool=False) if specified, do not remove the original file")
 @click.option('--no-nested', is_flag=True, default=False,
-              help="(optional, bool=False) in case FILE is a folder, pass it to avoid encrypting the nested folders")
+              help="(optional, bool=False) in case FILE is a folder, specify it to avoid encryption of "
+                   "the nested folders")
 @pass_config
 def encrypt_aes(config, file, keep, no_nested):
     """Encrypt files or folders using AES encryption"""
@@ -223,9 +224,10 @@ def encrypt_aes(config, file, keep, no_nested):
 @cli.command()
 @click.argument('file', required=True)
 @click.option('--keep', '-k', is_flag=True, default=False,
-              help="(optional, bool=False) if True, do not remove the original file")
+              help="(optional, bool=False) if specified, do not remove the original file")
 @click.option('--no-nested', is_flag=True, default=False,
-              help="(optional, bool=False) in case FILE is a folder, pass it to avoid encrypting the nested folders")
+              help="(optional, bool=False) in case FILE is a folder, specify it to avoid decryption of "
+                   "the nested folders")
 @pass_config
 def decrypt_aes(config, file, keep, no_nested):
     """Decrypt files or folders using AES encryption"""
