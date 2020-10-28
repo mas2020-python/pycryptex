@@ -42,6 +42,10 @@ def create_config() -> bool:
 [config]
 # path to the pager application where to see decrypted file
 pager = "vim"
+# default private key for RSA decryption
+private-key = ""
+# default public key for RSA encryption
+public-key = ""
 """)
             return True
     return False
@@ -54,7 +58,9 @@ def read_config():
     else:
         pycryptex.config_file = {
             "config": {
-                'pager': 'vim'
+                'pager': 'vim',
+                'private-key': "",
+                'public-key': "",
             }
         }
 

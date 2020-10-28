@@ -86,12 +86,14 @@ keys you can pass them directly as an argument to the encrypt and decrypt method
 An alternative, starting from version 0.4.0, could be save the path of the keys in the pycryptex confi file.
 
 
-PyCryptex to determine RSA keys to use for the `encrypt` and `decrypt` methods, follow these rules:
+**PyCryptex to determine RSA keys to use** for the `encrypt` and `decrypt` methods, follow these rules:
 - if the option --privkey or --pubkey is specified, it loads the corresponding file
 - if no option key is specified:
     - if is present privkey or pubkey field in *$HOME/.pycryptex/pycryptex.toml* it loads the corresponding file
     - loads my_key as private key and my_key.pub located in *$HOME/.pycryptex* directory
  
+These rules are not valid when you use `encrypt-aes` and `decrypt-aes` commands that always ask for a console password.
+
 ### Configuration file
 
 PyCryptex reads a configuration file located in your $HOME/.pycryptex folder named **pycryptex.toml**.
@@ -100,6 +102,10 @@ The file has the following syntax (reported are the default file):
 [config]
 # path to the pager application where to see decrypted file
 pager = "vim"
+# default private key for RSA decryption
+private-key = ""
+# default public key for RSA encryption
+public-key = ""
 ```
 
 ### List of all commands
