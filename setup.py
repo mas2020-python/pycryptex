@@ -25,6 +25,7 @@ setup(
         'click==7.1.2',
         'pycryptodome==3.9.8',
         'toml==0.10.1',
+        'tqdm==4.50.2',
     ],
     entry_points='''
         [console_scripts]

@@ -119,11 +119,14 @@ pycryptex encrypt --pubkey test/id_rsa.pub test/secrets.txt
 # to encrypt using the my_key.pub in $HOME/.pycryptex folder
 pycryptex encrypt test/secret.txt
 
-# to decrypt and delete the encrypted file
-pycryptex --verbose decrypt --privkey test/id_rsa  --remove test/secrets.txt.enc
+# to encrypt using the my_key.pub in $HOME/.pycryptex folder maintaining the original file
+pycryptex encrypt test/secret.txt --keep
 
-# decrypt, open the pager and then delete the decrypted file
-pycryptex --verbose decrypt --privkey test/id_rsa -s -p  test/secrets.txt.enc
+# decrypt the file
+pycryptex --verbose decrypt --privkey test/id_rsa test/secrets.txt.enc
+
+# decrypt using your own private key and open the pager
+pycryptex --verbose decrypt --privkey test/id_rsa -p test/secrets.txt.enc
 
 # decrypt and open the pager (loading keys from $HOME/.pycryptex)
 pycryptex decrypt -p test/secrets.txt.enc
@@ -159,7 +162,7 @@ pip3 install --editable .
 
 To install from PyPi test (other dependencies packages from official PyPi) type:
 ````shell script
-pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple pycryptex==<version>
+pip3 install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple pycryptex==<VERSION>
 ````
 
 To test the application type:
