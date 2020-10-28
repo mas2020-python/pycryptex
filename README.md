@@ -91,8 +91,6 @@ The file has the following syntax (reported are the default file):
 [config]
 # path to the pager application where to see decrypted file
 pager = "vim"
-# number of seconds the application will delete a file decrypted passing the s option flag
-wait_delete_time = 2
 ```
 
 ### List of all commands
