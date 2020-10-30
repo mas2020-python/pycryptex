@@ -48,9 +48,9 @@ def cli(config, verbose):
 @click.argument('file', required=True)
 @click.option('--pubkey', default="", help='(optional) specify the RSA public key')
 @click.option('--keep', '-k', is_flag=True, default=False,
-              help="(optional, bool=False) if True, do not remove the original file")
+              help="(optional, bool=False) if specified, do not remove the original file")
 @click.option('--no-nested', is_flag=True, default=False,
-              help="(optional, bool=False) in case FILE is a folder, pass it to avoid encrypting the nested folders")
+              help="(optional, bool=False) in case FILE is a folder, specify it to avoid encrypting the nested folders")
 @pass_config
 def encrypt(config, file, pubkey, keep, no_nested):
     """Encrypt files or folders using RSA/AES algorithms"""
@@ -59,23 +59,18 @@ def encrypt(config, file, pubkey, keep, no_nested):
         return
     try:
         # in case of pubkey is not passed, pycryptex calculates the default path
-        if len(pubkey) == 0:
-            pubkey = os.path.join(utils.get_home(), '.pycryptex', "my_key.pub")
-        # check if the key exists
-        if not path.exists(pubkey):
-            echo_invalid_key_msg(pubkey, "pubkey")
-            return
+        pubkey = load_key(pubkey, 'public-key', 'pycryptex_key.pub')
         rsa: RSACryptex = RSACryptex()
         # check if the file param is a file or a dir
         if os.path.isdir(file):
             encrypt_decrypt_folder(rsa.encrypt_data, True, folder=file, keep=keep, no_nested=no_nested,
                                    public_key=pubkey)
-            click.echo(click.style(f"👍 Folder encrypted successfully!", fg="green", bold=True))
+            click.echo(click.style(f"👍 Folder encrypted successfully! [key used: {pubkey}]", fg="green", bold=True))
         else:
             # encryption of the file
             f, done = common.encrypt_file(file=file, func=rsa.encrypt_data, remove=not keep, public_key=pubkey)
             if done:
-                click.echo(click.style(f"👍 File encrypted successfully in {f}", fg="green", bold=True))
+                click.echo(click.style(f"👍 File encrypted successfully in {f}! [key used: {pubkey}]", fg="green", bold=True))
             else:
                 click.echo(click.style(f"👍 Nothing to do, file already encrypted!", fg="yellow", bold=False))
 
@@ -91,11 +86,11 @@ def encrypt(config, file, pubkey, keep, no_nested):
 @click.argument('file', required=True)
 @click.option('--privkey', default="", help='(optional) specify the RSA private key')
 @click.option('--keep', '-k', is_flag=True, default=False,
-              help="(optional, bool=False) if True, do not remove the original file")
+              help="(optional, bool=False) if specified, do not remove the original file")
 @click.option('--pager', '-p', is_flag=True,
               help="(optional, bool=False) open the pager to read decrypted file (only if the FILE arg is a file)")
 @click.option('--no-nested', is_flag=True, default=False,
-              help="(optional, bool=False) in case FILE is a folder, pass it to avoid decrypting the nested folders")
+              help="(optional, bool=False) in case FILE is a folder, specify it to avoid decrypting the nested folders")
 @pass_config
 def decrypt(config, file, privkey, keep, pager, no_nested):
     """Decrypt files or folders using RSA/AES algorithms"""
@@ -104,16 +99,7 @@ def decrypt(config, file, privkey, keep, pager, no_nested):
         return
     try:
         f = ""
-        # in case of pubkey is not passed, pycryptex calculates the default path
-        if len(privkey) == 0:
-            privkey = os.path.join(utils.get_home(), '.pycryptex', 'my_key')
-        if config.verbose:
-            click.echo(click.style(f"priv_key used is: {privkey}", fg="magenta", bold=False))
-            # check if the key exists
-        if not path.exists(privkey):
-            echo_invalid_key_msg(privkey, "privkey")
-            return
-
+        privkey = load_key(privkey, 'private-key', 'pycryptex_key')
         # check if the private key has a password
         passphrase = None
         if RSACryptex.is_privatekey_protected(privkey):
@@ -122,12 +108,12 @@ def decrypt(config, file, privkey, keep, pager, no_nested):
         if os.path.isdir(file):
             encrypt_decrypt_folder(rsa.decrypt_data, False, folder=file, keep=keep,
                                    no_nested=no_nested, passprhase=passphrase, private_key=privkey)
-            click.echo(click.style(f"👍 Folder decrypted successfully!", fg="green", bold=True))
+            click.echo(click.style(f"👍 Folder decrypted successfully! [key used: {privkey}]", fg="green", bold=True))
         else:  # single file case
             f, done = common.decrypt_file(file=file, func=rsa.decrypt_data, remove=not keep, passprhase=passphrase,
                                           private_key=privkey)
             if done:
-                click.echo(click.style(f"👍 File decrypted successfully in {f}!", fg="green", bold=True))
+                click.echo(click.style(f"👍 File decrypted successfully in {f}! [key used: {privkey}]", fg="green", bold=True))
             else:
                 click.echo(click.style(f"👍 Nothing to do, file already decrypted!", fg="yellow", bold=False))
             # open file in a pager
@@ -156,8 +142,8 @@ def create_keys(config):
         is_created, pycryptex_folder = utils.create_home_folder()
         if is_created:
             click.echo(click.style(f"👍 .pycryptex folder created in: {pycryptex_folder}", fg="green", bold=False))
-        if os.path.exists(os.path.join(pycryptex_folder, 'my_key')) or \
-                os.path.exists(os.path.join(pycryptex_folder, 'my_key.pub')):
+        if os.path.exists(os.path.join(pycryptex_folder, 'pycryptex_key')) or \
+                os.path.exists(os.path.join(pycryptex_folder, 'pycryptex_key.pub')):
             click.echo(click.style(
                 "[PAY ATTENTION]\n"
                 "The standard keys are present into the default .pycryptex folder. If you confirm to proceed and\n"
@@ -196,7 +182,7 @@ def create_config(config):
                                    f"{os.path.join(utils.get_home(), '.pycryptex', 'pycryptex.toml')}", fg="green",
                                    bold=False))
         else:
-            click.echo(click.style(f"👍 nothing to do, file "
+            click.echo(click.style(f"👍 Nothing to do, file "
                                    f"{os.path.join(utils.get_home(), '.pycryptex', 'pycryptex.toml')} already exists!",
                                    fg="magenta", bold=False))
     except Exception as e:
@@ -207,9 +193,10 @@ def create_config(config):
 @cli.command()
 @click.argument('file', required=True)
 @click.option('--keep', '-k', is_flag=True, default=False,
-              help="(optional, bool=False) if True, do not remove the original file")
+              help="(optional, bool=False) if specified, do not remove the original file")
 @click.option('--no-nested', is_flag=True, default=False,
-              help="(optional, bool=False) in case FILE is a folder, pass it to avoid encrypting the nested folders")
+              help="(optional, bool=False) in case FILE is a folder, specify it to avoid encryption of "
+                   "the nested folders")
 @pass_config
 def encrypt_aes(config, file, keep, no_nested):
     """Encrypt files or folders using AES encryption"""
@@ -223,9 +210,10 @@ def encrypt_aes(config, file, keep, no_nested):
 @cli.command()
 @click.argument('file', required=True)
 @click.option('--keep', '-k', is_flag=True, default=False,
-              help="(optional, bool=False) if True, do not remove the original file")
+              help="(optional, bool=False) if specified, do not remove the original file")
 @click.option('--no-nested', is_flag=True, default=False,
-              help="(optional, bool=False) in case FILE is a folder, pass it to avoid encrypting the nested folders")
+              help="(optional, bool=False) in case FILE is a folder, specify it to avoid decryption of "
+                   "the nested folders")
 @pass_config
 def decrypt_aes(config, file, keep, no_nested):
     """Decrypt files or folders using AES encryption"""
@@ -240,13 +228,33 @@ def decrypt_aes(config, file, keep, no_nested):
         sys.exit(2)
 
 
-def echo_invalid_key_msg(missing_path: str, key_name: str):
-    click.echo(
-        click.style(f"Houston, help: the key is missing in '{missing_path}'", fg="red", bold=False))
-    click.echo(f"If you have your own key, pass the --{key_name} argument or, if you need pycryptex create "
-               "the keys for you, type:\n"
-               "pycryptex create-keys")
-
+def load_key(key_path: str, key_config_name: str, key_default: str) -> str:
+    """
+    PyCryptex try to load the RSA private or public keys
+    :param key_path: path of the key specified as parameter
+    :param key_config_name:
+    :param key_default:
+    :return:
+    """
+    if len(key_path) == 0:
+        # read config to check if there is a pubkey, else try to load pycryptex_key.pub
+        utils.read_config()
+        try:
+            if len(pycryptex.config_file['config'][key_config_name]) > 0:
+                key_path = pycryptex.config_file['config'][key_config_name]
+            else:
+                key_path = os.path.join(utils.get_home(), '.pycryptex', key_default)
+        except KeyError:
+            key_path = os.path.join(utils.get_home(), '.pycryptex', key_default)
+    # check if the key exists
+    if not path.exists(key_path):
+        click.echo(
+            click.style(f"Houston, help: the key is missing in '{key_path}'", fg="red", bold=False))
+        click.echo(f"If you have your own key, pass it as argument or, if you need pycryptex create "
+                   "the keys for you, type:\n"
+                   "pycryptex create-keys")
+        sys.exit(2)
+    return  key_path
 
 @timer
 def encrypt_decrypt_folder(func, is_encrypt: bool, folder: str, keep: bool, no_nested: bool = False, **kwargs):

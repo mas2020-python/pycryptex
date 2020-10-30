@@ -6,6 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Released]
 
+## [0.4.0] - 2020-10-30
+
+### Added
+
+- private and public key path in the pycryptex config file to set you default keys at the path you prefer
+- `aes-encrypt` and `aes-decrypt` as new commands to encrypt/decrypt using AES algorithm
+- feature to encrypt/decrypt folder and subfolders with RSA or AES
+
+### Fixed
+- remove wait_delete_time from config file and README file
+
+### Changed
+- name of the default PyCryptex keys in pycryptex_key and pycryptex_key.pub
+- added the --keep option as a default for encryption/decryption. Removed the --remove option
+- improvement to decrypt function
+
 ## [0.3.0] - 2020-10-21
 
 ### Added

@@ -42,27 +42,27 @@ def create_config() -> bool:
 [config]
 # path to the pager application where to see decrypted file
 pager = "vim"
-# number of seconds the application will delete a file decrypted passing the -s option flag
-wait_delete_time = 0""")
+# default private key for RSA decryption
+private-key = ""
+# default public key for RSA encryption
+public-key = ""
+""")
             return True
     return False
 
 
 def read_config():
-    try:
-        config_path = os.path.join(get_home(), '.pycryptex', 'pycryptex.toml')
-        if path.exists(config_path):
-            pycryptex.config_file = toml.load(config_path)
-        else:
-            pycryptex.config_file = {
-                "config": {
-                    'pager': 'vim',
-                    'wait_delete_time': 0
-                }
+    config_path = os.path.join(get_home(), '.pycryptex', 'pycryptex.toml')
+    if path.exists(config_path):
+        pycryptex.config_file = toml.load(config_path)
+    else:
+        pycryptex.config_file = {
+            "config": {
+                'pager': 'vim',
+                'private-key': "",
+                'public-key': "",
             }
-    except Exception as e:
-        click.echo(click.style(f"Houston, we have a problem in read_config: {e}", fg="red", bold=True))
-        sys.exit(1)
+        }
 
 
 def open_pager(config, f: str):

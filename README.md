@@ -1,7 +1,11 @@
 # PyCryptex
-This project is a CLI application for encryption and decryption using the pycryptodome package. For the CLI functionality it uses
-Click package.
 
+This project can be used as:
+
+- CLI application for encryption and decryption
+- a package to import in you project to create an encryption/decryption app
+
+For the CLI functionality it uses `click` package and for the encryption the amazing `pycryptodome` package.
 
 ## Install application
 
@@ -21,7 +25,7 @@ If you are on linux you could have this warning:
 WARNING: The script pycryptex is installed in '/home/<YOUR-HOME>/.local/bin' which is not on PATH.
 ```
 It means that if you type `pycryptex` you get a not found error.
-To solve, simply add the path to your PATH, for example, edit .bashrc in you $HOME folder as (suppose your HOME == vagrant):
+To solve, simply add the path to your PATH, for example, edit .bashrc in your $HOME folder as (suppose your HOME == vagrant):
 ```
 # Add local python bin script to my PATH:
 export PATH=$PATH:/home/vagrant/.local/bin
@@ -37,7 +41,7 @@ It should work now and for all the future updates!
 
 ### Fast start
 
-If you want encrypt and decrypt files and folders easily and you do not want spend time to create your own encryption keys you can let
+If you want encrypt and decrypt files and folders easily and you do not want spend time to create your own encryption keys, you can let
 PyCryptex do the job for you (to use your own keys or understanding better the behaviour of the application refers to the rest of the documentation):
 ```shell script
 pycryptex create-keys
@@ -45,7 +49,7 @@ pycryptex create-keys
 answer 'yes' and decide if protect the private key with a password (it's your security choice).
 PyCryptex will create the standard key in your *$HOME/.pycryptex* folder.
 
-***IMPORTANT***: you will use your public key (my_key.pub) for encrypt and you private key (my_key) for decrypt. Do not leave the keys in the same place, secure you private key as best as you can, as you do with your private HOME keys ;-)!
+***IMPORTANT***: you will use your public key (pycryptex_key.pub) for encrypt and you private key (pycryptex_key) for decrypt. Do not leave the keys in the same place, secure you private key as best as you can, as you do with your private HOME keys ;-)!
 
 At this point you can simply encrypt a file or a folder using:
 ```shell script
@@ -78,10 +82,22 @@ In this way the performance are definitely better on a large file (a 256 bit AES
 
 
 The default keys name:
-- my_key: for the private key
-- my_key.pub: for the public key
+- pycryptex_key: for the private key
+- pycryptex_key.pub: for the public key
 The folder where **`pycryptex`** searches for the key is your $HOME/.pycryptex. If you prefer to use your own
 keys you can pass them directly as an argument to the encrypt and decrypt method.
+
+An alternative, starting from version 0.4.0, could be save the path of the keys in the pycryptex confi file.
+
+
+**PyCryptex determines the RSA keys to use** for the `encrypt` and `decrypt` methods, follow these rules:
+
+- if the option --privkey or --pubkey is specified, it loads the corresponding file
+- if no option key is specified:
+    - if is present privkey or pubkey field in *$HOME/.pycryptex/pycryptex.toml* it loads the corresponding file
+    - loads pycryptex_key as private key and pycryptex_key.pub located in *$HOME/.pycryptex* directory
+ 
+These rules are not valid when you use `encrypt-aes` and `decrypt-aes` commands that always ask for a console password.
 
 ### Configuration file
 
@@ -91,8 +107,10 @@ The file has the following syntax (reported are the default file):
 [config]
 # path to the pager application where to see decrypted file
 pager = "vim"
-# number of seconds the application will delete a file decrypted passing the s option flag
-wait_delete_time = 2
+# default private key for RSA decryption
+private-key = ""
+# default public key for RSA encryption
+public-key = ""
 ```
 
 ### List of all commands
@@ -116,14 +134,17 @@ Some basic example usages are:
 # to encrypt passing a key
 pycryptex encrypt --pubkey test/id_rsa.pub test/secrets.txt
 
-# to encrypt using the my_key.pub in $HOME/.pycryptex folder
+# to encrypt using the pycryptex_key.pub in $HOME/.pycryptex folder
 pycryptex encrypt test/secret.txt
 
-# to decrypt and delete the encrypted file
-pycryptex --verbose decrypt --privkey test/id_rsa  --remove test/secrets.txt.enc
+# to encrypt using the pycryptex_key.pub in $HOME/.pycryptex folder maintaining the original file
+pycryptex encrypt test/secret.txt --keep
 
-# decrypt, open the pager and then delete the decrypted file
-pycryptex --verbose decrypt --privkey test/id_rsa -s -p  test/secrets.txt.enc
+# decrypt the file
+pycryptex --verbose decrypt --privkey test/id_rsa test/secrets.txt.enc
+
+# decrypt using your own private key and open the pager
+pycryptex --verbose decrypt --privkey test/id_rsa -p test/secrets.txt.enc
 
 # decrypt and open the pager (loading keys from $HOME/.pycryptex)
 pycryptex decrypt -p test/secrets.txt.enc
@@ -131,6 +152,14 @@ pycryptex decrypt -p test/secrets.txt.enc
 # to create private/public key pairs
 pycryptex create-keys
 ````
+To combine decrypt + read a file + encrypt again you can use something as:
+```shell script
+pycryptex decrypt --privkey <YOUR-PATH-TO-PRIVATE-KEY> <FILE.pycypx> \
+&& vim <FILE> && \
+pycryptex encrypt --pubkey <YOUR-PATH-TO-PUBLIC-KEY> <FILE>
+```
+By this way, you can change the clear content also using the right pager, as vim for example.
+In case your keys are in your `pycryptex` HOME folder or set into the `pycryptex.toml` file, you can omit to pass them.
 
 ## Configuration for developers
 
@@ -159,7 +188,7 @@ pip3 install --editable .
 
 To install from PyPi test (other dependencies packages from official PyPi) type:
 ````shell script
-pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple pycryptex==<version>
+pip3 install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple pycryptex==<VERSION>
 ````
 
 To test the application type:
@@ -169,6 +198,7 @@ pytest
 
 To deploy on PyPi test:
 ```shell script
+python3 setup.py check
 python3 setup.py bdist_wheel sdist
 twine upload dist/* --repository testpypi
 ```
