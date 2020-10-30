@@ -1,7 +1,11 @@
 # PyCryptex
-This project is a CLI application for encryption and decryption using the pycryptodome package. For the CLI functionality it uses
-Click package.
 
+This project can be used as:
+
+- CLI application for encryption and decryption
+- a package to import in you project to create an encryption/decryption app
+
+For the CLI functionality it uses `click` package and for the encryption the amazing `pycryptodome` package.
 
 ## Install application
 
@@ -37,7 +41,7 @@ It should work now and for all the future updates!
 
 ### Fast start
 
-If you want encrypt and decrypt files and folders easily and you do not want spend time to create your own encryption keys you can let
+If you want encrypt and decrypt files and folders easily and you do not want spend time to create your own encryption keys, you can let
 PyCryptex do the job for you (to use your own keys or understanding better the behaviour of the application refers to the rest of the documentation):
 ```shell script
 pycryptex create-keys
@@ -86,7 +90,8 @@ keys you can pass them directly as an argument to the encrypt and decrypt method
 An alternative, starting from version 0.4.0, could be save the path of the keys in the pycryptex confi file.
 
 
-**PyCryptex to determine RSA keys to use** for the `encrypt` and `decrypt` methods, follow these rules:
+**PyCryptex determines the RSA keys to use** for the `encrypt` and `decrypt` methods, follow these rules:
+
 - if the option --privkey or --pubkey is specified, it loads the corresponding file
 - if no option key is specified:
     - if is present privkey or pubkey field in *$HOME/.pycryptex/pycryptex.toml* it loads the corresponding file
