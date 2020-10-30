@@ -33,13 +33,15 @@ pass_config = click.make_pass_decorator(Config, ensure=True)
 @pass_config
 def cli(config, verbose):
     """
-    This command is executed before other commands in the same group. The group commands
-    are between the main command (pycrypto) and the single commands.
+    pycryptex is a CLI application to help you easily encrypt/decrypt some files or
+    folders.
 
     For instance:
-    pycryptex --verbose encrypt test/appway.png
+    pycryptex --verbose encrypt test/mysecret.yaml
 
-    Using config.verbose is possible to pass verbose from a command to another
+    Use --verbose between pycryptex and the command to have debugging information.
+
+    #happyencryption
     """
     config.verbose = verbose
 

@@ -3,7 +3,7 @@
 This project can be used as:
 
 - CLI application for encryption and decryption
-- a package to import in you project to create an encryption/decryption app
+- a package to import in your personal project to create an encryption/decryption app
 
 For the CLI functionality it uses `click` package and for the encryption the amazing `pycryptodome` package.
 
