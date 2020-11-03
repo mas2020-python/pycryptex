@@ -74,7 +74,7 @@ def encrypt(config, file, pubkey, keep, no_nested):
             if done:
                 click.echo(click.style(f"👍 File encrypted successfully in {f}! [key used: {pubkey}]", fg="green", bold=True))
             else:
-                click.echo(click.style(f"👍 Nothing to do, file already encrypted!", fg="yellow", bold=False))
+                click.echo(click.style(f"● Nothing to do, file already encrypted!", fg="white", bold=False))
 
         if config.verbose:
             click.echo(click.style(f"pubkey used is: {pubkey}", fg="magenta", bold=False))
@@ -127,7 +127,7 @@ def decrypt(config, file, privkey, keep, pager, no_nested):
                 if done:
                     click.echo(click.style(f"👍 File decrypted successfully in {f}! [key used: {privkey}]", fg="green", bold=True))
                 else:
-                    click.echo(click.style(f"👍 Nothing to do, file already decrypted!", fg="yellow", bold=False))
+                    click.echo(click.style(f"● Nothing to do, file already decrypted!", fg="white", bold=False))
 
 
     except ValueError as e:
@@ -192,13 +192,18 @@ def create_config(config):
                                    f"{os.path.join(utils.get_home(), '.pycryptex', 'pycryptex.toml')}", fg="green",
                                    bold=False))
         else:
-            click.echo(click.style(f"👍 Nothing to do, file "
+            click.echo(click.style(f"● Nothing to do, file "
                                    f"{os.path.join(utils.get_home(), '.pycryptex', 'pycryptex.toml')} already exists!",
-                                   fg="magenta", bold=False))
+                                   fg="white", bold=False))
     except Exception as e:
         click.echo(click.style(f"● Houston, help: {e}", fg="red", bold=True))
         sys.exit(2)
 
+@cli.command()
+@pass_config
+def show_config(config):
+    """Show the config file content (if it is present in $HOME/.pycryptex)"""
+    utils.show_config()
 
 @cli.command()
 @click.argument('file', required=True)
@@ -330,7 +335,7 @@ def encrypt_decrypt_aes(config, file, keep, no_nested, is_encryption: bool):
         if done:
             click.echo(click.style(f"👍 File {crypto_term} successfully in {f}", fg="green", bold=True))
         else:
-            click.echo(click.style(f"👍 Nothing to do, file already {crypto_term}!", fg="yellow", bold=False))
+            click.echo(click.style(f"● Nothing to do, file already {crypto_term}!", fg="white", bold=False))
 
     if config.verbose:
         click.echo(click.style(f"config_file loaded: {pycryptex.config_file}", fg="magenta", bold=True))
