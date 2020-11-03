@@ -143,6 +143,7 @@ Follow the list of commands:
 - `decrypt`: to decrypt a single file a single file or a folder (including sub folders).
 - `create-keys`: to create a public key and private key pair.
 - `create-config`: to create the default config file under $HOME/.pycryptex/pycryptex.toml
+- `show-config`: to show the configuration file if present into the $HOME/.pycryptex folder
 - `encrypt-aes`: to encrypt a single file or a folder (including sub folders) using AES algorithm.
 - `decrypt-aes`: to decrypt a single file a single file or a folder (including sub folders) using AES algorithm.
 

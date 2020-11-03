@@ -72,7 +72,8 @@ def encrypt(config, file, pubkey, keep, no_nested):
             # encryption of the file
             f, done = common.encrypt_file(file=file, func=rsa.encrypt_data, remove=not keep, public_key=pubkey)
             if done:
-                click.echo(click.style(f"👍 File encrypted successfully in {f}! [key used: {pubkey}]", fg="green", bold=True))
+                click.echo(
+                    click.style(f"👍 File encrypted successfully in {f}! [key used: {pubkey}]", fg="green", bold=True))
             else:
                 click.echo(click.style(f"● Nothing to do, file already encrypted!", fg="white", bold=False))
 
@@ -125,7 +126,8 @@ def decrypt(config, file, privkey, keep, pager, no_nested):
                 f, done = common.decrypt_file(file=file, func=rsa.decrypt_data, remove=not keep, passprhase=passphrase,
                                               private_key=privkey)
                 if done:
-                    click.echo(click.style(f"👍 File decrypted successfully in {f}! [key used: {privkey}]", fg="green", bold=True))
+                    click.echo(click.style(f"👍 File decrypted successfully in {f}! [key used: {privkey}]", fg="green",
+                                           bold=True))
                 else:
                     click.echo(click.style(f"● Nothing to do, file already decrypted!", fg="white", bold=False))
 
@@ -199,11 +201,13 @@ def create_config(config):
         click.echo(click.style(f"● Houston, help: {e}", fg="red", bold=True))
         sys.exit(2)
 
+
 @cli.command()
 @pass_config
 def show_config(config):
     """Show the config file content (if it is present in $HOME/.pycryptex)"""
     utils.show_config()
+
 
 @cli.command()
 @click.argument('file', required=True)
@@ -269,7 +273,8 @@ def load_key(key_path: str, key_config_name: str, key_default: str) -> str:
                    "the keys for you, type:\n"
                    "pycryptex create-keys")
         sys.exit(2)
-    return  key_path
+    return key_path
+
 
 @timer
 def encrypt_decrypt_folder(func, is_encrypt: bool, folder: str, keep: bool, no_nested: bool = False, **kwargs):
