@@ -65,6 +65,22 @@ def read_config():
         }
 
 
+def show_config():
+    """
+    Show the config file content if the file is present.
+    :return:
+    """
+    config_path = os.path.join(get_home(), '.pycryptex', 'pycryptex.toml')
+    if path.exists(config_path):
+        with open(config_path, 'r') as reader:
+            # Read all bytes
+            click.echo(click.style(reader.read(), fg="magenta", bold=False))
+            click.echo(f"PyCryptex config file is read from here: {config_path}")
+    else:
+        click.echo(
+            click.style(f"● Nothing to do, file pycryptex.toml has not been created yet...", fg="white", bold=False))
+
+
 def open_pager(config, dec_bytes: bytes):
     # load config file first
     read_config()
@@ -97,6 +113,6 @@ def count_file(path, no_nested: bool) -> int:
 def is_valid_path(path) -> bool:
     # test first for file existence
     if not os.path.exists(path):
-        click.echo(click.style(f"👍 Nothing to do, file or folder {path} doesn't exist!", fg="yellow", bold=False))
+        click.echo(click.style(f"● Nothing to do, file or folder {path} doesn't exist!", fg="white", bold=False))
         return False
     return True
