@@ -2,7 +2,6 @@
 Utils module for repetitive jobs.
 """
 import os
-import sys
 from pathlib import Path
 import subprocess
 import pycryptex
@@ -40,8 +39,9 @@ def create_config() -> bool:
         with open(pycryptex_config_file, "w") as f:
             f.write("""# Configuration file for pycryptex
 [config]
-# path to the pager application where to see decrypted file
-pager = "vim"
+# path to the pager application where to see decrypted file. Other pager could be 'code -', 'sublime -', 'nano -'
+# from version 2.2, 'cat' (not suggested as stays output into the shell), 'vim -'...
+pager = "less"
 # default private key for RSA decryption
 private-key = ""
 # default public key for RSA encryption
@@ -65,15 +65,13 @@ def read_config():
         }
 
 
-def open_pager(config, f: str):
+def open_pager(config, dec_bytes: bytes):
     # load config file first
     read_config()
     if config.verbose:
         click.echo(click.style(f"config_file loaded: {pycryptex.config_file}", fg="magenta", bold=True))
-    exit_code = subprocess.call([pycryptex.config_file['config']['pager'], f])
-    if exit_code != 0:
-        click.echo(click.style(f"Houston, we have a problem: the opened subprocess has a return value equal to"
-                               f" {exit_code}", fg="red", bold=True))
+    process = subprocess.Popen(pycryptex.config_file['config']['pager'].split(' '), shell=False, stdin=subprocess.PIPE)
+    process.communicate(dec_bytes)
 
 
 def count_file(path, no_nested: bool) -> int:
