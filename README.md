@@ -66,19 +66,20 @@ pycryptex decrypt <FILE-OR-FOLDER>
 That's it for the PyCryptex in a `nutshell`. Go ahead with the lecture to figure out how to make the most of the application.
 
 #### Decryption with a pager
-Pager option behaviour changed in version `0.5.0`. Now is possible to use `decryption` only to read a file, avoiding to save the clear file on the system (if it is not needed).
+Pager option behaviour is changed in version `0.5.0`. Now it is possible to use `decryption` also for reading a file without saving the clear file on the system (if it is not needed).
 Actually the pager is enabled only for the command `decrypt` and not for the command `decrypt-aes`.
 So, for example if you decrypt without option:
 ```shell script
 pycryptex decrypt <FILE-OR-FOLDER>
 ```
-you save the decrypted file on the file system, instead if you type:
+PyCryptex will save the decrypted file on the file system, instead if you type:
 ```shell script
 pycryptex decrypt <FILE-OR-FOLDER> --pager
 ```
-PyCryptex decrypt the file in memory and redirect it on the standard input of the pager set in your configuration file.
-Starting from `0.5.0` version is also changed the default pager, from 'vim' to 'less'.
-You can change it using your prefer pager (simply create the configuration file with the corresponding command and then edit it), some examples below:
+PyCryptex will decrypt the file in memory and redirect it on the standard input of the pager set in your configuration file.
+Starting from `0.5.0` version is also changed the default pager in favour of 'less' instead of 'vim'.
+You can change it to use your favourite pager (simply create the configuration file `pycryptex create-config` then edit it),
+some examples are:
 - `code -` to use Visual Studio Code (to enable the command `code` see the Microsoft site)
 - `sublime -` to use with sublime (in case you do not have it on the executable in PATH, see on the official documentation to solve the issue)
 - `vim -` to use vim
@@ -160,18 +161,18 @@ pycryptex encrypt test/secret.txt
 pycryptex encrypt test/secret.txt --keep
 
 # decrypt the file
-pycryptex --verbose decrypt --privkey test/id_rsa test/secrets.txt.enc
+pycryptex --verbose decrypt --privkey test/id_rsa test/secrets.txt.pycpx
 
 # decrypt using your own private key and open the pager
-pycryptex --verbose decrypt --privkey test/id_rsa -p test/secrets.txt.enc
+pycryptex --verbose decrypt --privkey test/id_rsa -p test/secrets.txt.pycpx
 
 # decrypt and open the pager (loading keys from $HOME/.pycryptex)
-pycryptex decrypt -p test/secrets.txt.enc
+pycryptex decrypt -p test/secrets.txt.pycpx
 
 # to create private/public key pairs
 pycryptex create-keys
 ````
-To combine decrypt + read a file + encrypt again you can use something as:
+To combine decrypt + read and modify a file + encrypt again you can use something as:
 ```shell script
 pycryptex decrypt --privkey <YOUR-PATH-TO-PRIVATE-KEY> <FILE.pycypx> \
 && vim <FILE> && \
@@ -179,6 +180,43 @@ pycryptex encrypt --pubkey <YOUR-PATH-TO-PUBLIC-KEY> <FILE>
 ```
 By this way, you can change the clear content also using the right pager, as vim for example.
 In case your keys are in your `pycryptex` HOME folder or set into the `pycryptex.toml` file, you can omit to pass them.
+If you need only read an encrypted file content use simple the --pager option as described before.
+
+### Shell auto completion for pycryptex
+PyCryptex commands, options and arguments can be added to your favourite shell for the auto completion.
+After you have installed the application follow the instructions choosing the shell you have.
+
+#### `bash` configuration
+If your favourite shell is **`bash`** then type:
+```shell script
+cd <YOUR-FOLDER>
+# type this command
+_PYCRYPTEX_COMPLETE=source_bash pycryptex > pycryptex.sh
+```
+now you that have the file `pycryptex.sh` open you $HOME/.bashrc file and add this content:
+```shell script
+vim $HOME/.bashrc
+source /PATH-TO-PYCRYPTEX-SCRIPT/pycryptex.sh
+```
+
+#### `zsh` configuration
+If your favourite shell is **`zsh`** then type:
+```shell script
+cd <YOUR-FOLDER>
+# type this command
+_PYCRYPTEX_COMPLETE=source_zsh pycryptex > pycryptex.sh
+```
+now you that have the file `pycryptex.sh` open you $HOME/.zshrc file and add this content:
+```shell script
+vim $HOME/.zshrc
+source /PATH-TO-PYCRYPTEX-SCRIPT/pycryptex.sh
+```
+
+#### `fish` configuration
+If your favourite shell is **`fish`** then type:
+```shell script
+_PYCRYPTEX_COMPLETE=source_fish pycryptex > ~/.config/fish/completions/pycryptex-complete.fish
+```
 
 ## Configuration for developers
 
