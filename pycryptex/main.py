@@ -112,15 +112,23 @@ def decrypt(config, file, privkey, keep, pager, no_nested):
                                    no_nested=no_nested, passprhase=passphrase, private_key=privkey)
             click.echo(click.style(f"👍 Folder decrypted successfully! [key used: {privkey}]", fg="green", bold=True))
         else:  # single file case
-            f, done = common.decrypt_file(file=file, func=rsa.decrypt_data, remove=not keep, passprhase=passphrase,
-                                          private_key=privkey)
-            if done:
-                click.echo(click.style(f"👍 File decrypted successfully in {f}! [key used: {privkey}]", fg="green", bold=True))
-            else:
-                click.echo(click.style(f"👍 Nothing to do, file already decrypted!", fg="yellow", bold=False))
             # open file in a pager
             if pager:
-                utils.open_pager(config, f)
+                # read the file
+                with open(file, 'rb') as byte_reader:
+                    # Read all bytes
+                    enc_bytes = byte_reader.read(-1)
+                # get decrypted data
+                dec_bytes = rsa.decrypt_data(enc_bytes, privkey, passphrase)
+                utils.open_pager(config, dec_bytes)
+            else:
+                f, done = common.decrypt_file(file=file, func=rsa.decrypt_data, remove=not keep, passprhase=passphrase,
+                                              private_key=privkey)
+                if done:
+                    click.echo(click.style(f"👍 File decrypted successfully in {f}! [key used: {privkey}]", fg="green", bold=True))
+                else:
+                    click.echo(click.style(f"👍 Nothing to do, file already decrypted!", fg="yellow", bold=False))
+
 
     except ValueError as e:
         click.echo(click.style(f"Houston, help: it is possible that you use the wrong key file to decrypt "

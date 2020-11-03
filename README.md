@@ -65,6 +65,25 @@ pycryptex decrypt <FILE-OR-FOLDER>
 ```
 That's it for the PyCryptex in a `nutshell`. Go ahead with the lecture to figure out how to make the most of the application.
 
+#### Decryption with a pager
+Pager option behaviour changed in version `0.5.0`. Now is possible to use `decryption` only to read a file, avoiding to save the clear file on the system (if it is not needed).
+Actually the pager is enabled only for the command `decrypt` and not for the command `decrypt-aes`.
+So, for example if you decrypt without option:
+```shell script
+pycryptex decrypt <FILE-OR-FOLDER>
+```
+you save the decrypted file on the file system, instead if you type:
+```shell script
+pycryptex decrypt <FILE-OR-FOLDER> --pager
+```
+PyCryptex decrypt the file in memory and redirect it on the standard input of the pager set in your configuration file.
+Starting from `0.5.0` version is also changed the default pager, from 'vim' to 'less'.
+You can change it using your prefer pager (simply create the configuration file with the corresponding command and then edit it), some examples below:
+- `code -` to use Visual Studio Code (to enable the command `code` see the Microsoft site)
+- `sublime -` to use with sublime (in case you do not have it on the executable in PATH, see on the official documentation to solve the issue)
+- `vim -` to use vim
+- `nano -` to use nano (starting from version 2.2)
+
 ***Happy Encryption!!!***
 
 ### Using application
@@ -76,7 +95,7 @@ pycryptex --help
 
 PyCryptex encryption works with symmetric or asymmetric algorithms based on the arguments passed.
 To the standard encryption/decryption ``pycryptex`` uses RSA keys pair. In particular, it encrypts using the public key of the user and decrypts
-using the private key. For better performance ``pycryptex`` behind the scene uses for encryption and decryption the AES algorithm.
+using the private key. For better performance ``pycryptex`` behind the scene uses the AES algorithm.
 The RSA keys are used to encrypt and decrypt the random key generated and stored as header to the file.
 In this way the performance are definitely better on a large file (a 256 bit AES random key is used).
 
@@ -88,7 +107,6 @@ The folder where **`pycryptex`** searches for the key is your $HOME/.pycryptex. 
 keys you can pass them directly as an argument to the encrypt and decrypt method.
 
 An alternative, starting from version 0.4.0, could be save the path of the keys in the pycryptex confi file.
-
 
 **PyCryptex determines the RSA keys to use** for the `encrypt` and `decrypt` methods, follow these rules:
 
