@@ -94,23 +94,10 @@ def get_decrypt_files(ctx, args, incomplete):
     :return:
     """
 
-    """
-    input could be:
-    - /test/x
-    - test/x
-    - x
-    """
-    # ALGO TODO:
-    # if incomplete is a dir, return current_dir = incomplete, init_word = ""
-    # if incomplete is NOT a dir, join with os.getcwd(): if join is a dir => current_dir = incomplete, , init_word = ""
-    # if incomplete contains / remove the last word previous the last slash, join it with os.getcwd():
-    #   if join is a dir => current_dir = join, initial_word = last part
-    # return initial_word == incomplete
-    current_directory = Path(os.getcwd())
-    # check first if incomplete is a dir
-    if os.path.isdir(os.path.join(Path(os.getcwd()), incomplete)):
-        current_directory = os.path.join(Path(os.getcwd()), incomplete)
-    return [str(f.name) for f in current_directory.iterdir() if str(f.name).startswith(incomplete)]
+    # get the right dir and file where to search
+    current_directory, incomplete = utils.get_incomplete_searches(incomplete)
+    current_directory = Path(current_directory)
+    return [str(f.absolute()) for f in current_directory.iterdir() if str(f.name).startswith(incomplete)]
     #return [str(f.name) for f in current_directory.iterdir()]
 
 @cli.command()
@@ -376,4 +363,5 @@ def encrypt_decrypt_aes(config, file, keep, no_nested, is_encryption: bool):
 
 if __name__ == '__main__':
     print("main invoked!")
-    cli(sys.argv[1:])
+    #cli(sys.argv[1:])
+    utils.get_incomplete_searches("/test/xx")

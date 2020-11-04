@@ -81,6 +81,25 @@ def show_config():
             click.style(f"● Nothing to do, file pycryptex.toml has not been created yet...", fg="white", bold=False))
 
 
+def get_incomplete_searches(incomplete: str) -> (str, str):
+    # if incomplete is a dir, return current_dir = incomplete, init_word = ""
+    if os.path.isdir(incomplete):
+        return incomplete, ""
+
+    # if incomplete is NOT a dir, join with os.getcwd(), if ok incomplete = current + incomplete, init_word = ""
+    if os.path.isdir(os.path.join(Path(os.getcwd()), incomplete)):
+        return os.path.join(Path(os.getcwd()), incomplete), ""
+
+    # if incomplete contains / remove the last word previous the last slash, join it with os.getcwd():
+    if incomplete.find("/") > -1:
+        s = incomplete.split('/')
+        dir = "/".join(s[: -1])
+        if os.path.isdir(dir):
+            return dir, s[-1]
+    # return current dir, initial_word == incomplete
+    return os.getcwd(), incomplete
+
+
 def open_pager(config, dec_bytes: bytes):
     # load config file first
     read_config()
