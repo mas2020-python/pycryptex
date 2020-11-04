@@ -82,6 +82,11 @@ def show_config():
 
 
 def get_incomplete_searches(incomplete: str) -> (str, str):
+    """
+    This function calculate the dir and the incomplete word to do shell completion.
+    :param incomplete: str typed by the user
+    :return: directory and incomplete word
+    """
     # if incomplete is a dir, return current_dir = incomplete, init_word = ""
     if os.path.isdir(incomplete):
         return incomplete, ""
@@ -96,6 +101,9 @@ def get_incomplete_searches(incomplete: str) -> (str, str):
         dir = "/".join(s[: -1])
         if os.path.isdir(dir):
             return dir, s[-1]
+        if incomplete.startswith("/"):
+            return "/", incomplete[1:]
+
     # return current dir, initial_word == incomplete
     return os.getcwd(), incomplete
 

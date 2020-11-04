@@ -27,6 +27,21 @@ class Config():
 pass_config = click.make_pass_decorator(Config, ensure=True)
 
 
+def get_decrypt_files(ctx, args, incomplete):
+    """
+    Autocompletion function for the 'decrypt' command: searches for file or dir starting with the typed characters
+    :param ctx:
+    :param args:
+    :param incomplete:
+    :return:
+    """
+    # get the right dir and file where to search
+    current_directory, incomplete = utils.get_incomplete_searches(incomplete)
+    current_directory = Path(current_directory)
+    # iterate first level dir and fetch files or folders in match with incomplete word
+    return [str(f.absolute()) for f in current_directory.iterdir() if str(f.name).startswith(incomplete)]
+
+
 @click.group()
 @click.version_option(version=None, message="pycryptex CLI application (version: %(version)s)")
 @click.option('--verbose', "-v", is_flag=True, help='bool, to specify if needed a verbose mode')
@@ -47,7 +62,7 @@ def cli(config, verbose):
 
 
 @cli.command()
-@click.argument('file', required=True)
+@click.argument('file', required=True, autocompletion=get_decrypt_files)
 @click.option('--pubkey', default="", help='(optional) specify the RSA public key')
 @click.option('--keep', '-k', is_flag=True, default=False,
               help="(optional, bool=False) if specified, do not remove the original file")
@@ -84,21 +99,6 @@ def encrypt(config, file, pubkey, keep, no_nested):
         click.echo(click.style(f"● Houston, help: {e}, {type(e)}", fg="red", bold=True))
         sys.exit(2)
 
-
-def get_decrypt_files(ctx, args, incomplete):
-    """
-    Autocompletion function for the 'decrypt' command: searches for file or dir starting with the typed characters
-    :param ctx:
-    :param args:
-    :param incomplete:
-    :return:
-    """
-
-    # get the right dir and file where to search
-    current_directory, incomplete = utils.get_incomplete_searches(incomplete)
-    current_directory = Path(current_directory)
-    return [str(f.absolute()) for f in current_directory.iterdir() if str(f.name).startswith(incomplete)]
-    #return [str(f.name) for f in current_directory.iterdir()]
 
 @cli.command()
 @click.argument('file', required=True, autocompletion=get_decrypt_files)
@@ -225,7 +225,7 @@ def show_config(config):
 
 
 @cli.command()
-@click.argument('file', required=True)
+@click.argument('file', required=True, autocompletion=get_decrypt_files)
 @click.option('--keep', '-k', is_flag=True, default=False,
               help="(optional, bool=False) if specified, do not remove the original file")
 @click.option('--no-nested', is_flag=True, default=False,
@@ -242,7 +242,7 @@ def encrypt_aes(config, file, keep, no_nested):
 
 
 @cli.command()
-@click.argument('file', required=True)
+@click.argument('file', required=True, autocompletion=get_decrypt_files)
 @click.option('--keep', '-k', is_flag=True, default=False,
               help="(optional, bool=False) if specified, do not remove the original file")
 @click.option('--no-nested', is_flag=True, default=False,
@@ -363,5 +363,5 @@ def encrypt_decrypt_aes(config, file, keep, no_nested, is_encryption: bool):
 
 if __name__ == '__main__':
     print("main invoked!")
-    #cli(sys.argv[1:])
-    utils.get_incomplete_searches("/test/xx")
+    # cli(sys.argv[1:])
+    utils.get_incomplete_searches("/Vol")
