@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - new `show-config` command to show the configuration file if present into the $HOME/.pycryptex folder
+- `--force` option to `create-config` command
 
 ### Fixed
 - 

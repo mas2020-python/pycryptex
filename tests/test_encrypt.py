@@ -4,12 +4,14 @@ from Crypto.Hash import SHA256
 from pycryptex.main import cli
 from pycryptex.crypto.aes import AESCryptex
 
+
 def test_encrypt():
     runner = CliRunner()
-    if os.path.exists('encryption_area/secrets.txt.enc'):
-        os.remove('encryption_area/secrets.txt.enc')
+    if os.path.exists('encryption_area/secrets.txt.pycpx'):
+        os.remove('encryption_area/secrets.txt.pycpx')
     result = runner.invoke(cli,
-                           ['encrypt', '--pubkey', 'encryption_area/id_rsa.pub', 'encryption_area/secrets.txt', '--keep'])
+                           ['encrypt', '--pubkey', 'encryption_area/id_rsa.pub', 'encryption_area/secrets.txt',
+                            '--keep'])
     assert result.exit_code == 0
     assert not result.exception
     assert os.path.exists('encryption_area/secrets.txt.pycpx') is True
@@ -47,8 +49,8 @@ def test_aes():
     ori_hash_object = SHA256.new(data=clear_bytes)
 
     # encrypt image
-    enc_data = aes.encrypt_data(clear_bytes, 'test') # get encrypted data bytes
-    dec_data = aes.decrypt_data(enc_data, 'test') # get decrypted data bytes
+    enc_data = aes.encrypt_data(clear_bytes, 'test')  # get encrypted data bytes
+    dec_data = aes.decrypt_data(enc_data, 'test')  # get decrypted data bytes
     dec_hash_object = SHA256.new(data=dec_data)
     # compare ori HASH and dec HASH
     assert ori_hash_object.hexdigest() == dec_hash_object.hexdigest()

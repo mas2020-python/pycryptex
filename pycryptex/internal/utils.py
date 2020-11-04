@@ -26,7 +26,7 @@ def create_home_folder():
     return False, pycryptex_folder
 
 
-def create_config() -> bool:
+def create_config(force: bool) -> bool:
     """
     If it does not exist $HOME/.pycryptex/pycryptex.toml file will be created
     :return:
@@ -35,7 +35,7 @@ def create_config() -> bool:
     create_home_folder()
     pycryptex_config_file = os.path.join(get_home(), '.pycryptex', 'pycryptex.toml')
 
-    if not os.path.exists(pycryptex_config_file):
+    if not os.path.exists(pycryptex_config_file) or force:
         with open(pycryptex_config_file, "w") as f:
             f.write("""# Configuration file for pycryptex
 [config]
@@ -46,6 +46,11 @@ pager = "less"
 private-key = ""
 # default public key for RSA encryption
 public-key = ""
+# (default false) true/false to secure delete files (if activated deletion of files becomes slower)
+secure-deletion = false
+# number of passes for secure deletion. Means how many times PyCryptex write random data into the file.
+# greater is the number you adopt major security but deletion becomes slower
+secure-deletion-passes = 1
 """)
             return True
     return False
@@ -61,6 +66,8 @@ def read_config():
                 'pager': 'vim',
                 'private-key': "",
                 'public-key': "",
+                'secure-deletion': False,
+                'secure-deletion-passes': 1,
             }
         }
 
@@ -116,3 +123,33 @@ def is_valid_path(path) -> bool:
         click.echo(click.style(f"● Nothing to do, file or folder {path} doesn't exist!", fg="white", bold=False))
         return False
     return True
+
+
+def secure_delete(path, passes=1):
+    """
+    Secure remove file, thanks to:
+    https://stackoverflow.com/users/2868788/phealy3330
+    to comment this article:
+    https://stackoverflow.com/questions/17455300/python-securely-remove-file
+    :param path: path to remove
+    :param passes: (default 1) number of passes
+    :return:
+    """
+    if not os.path.isfile(path):
+        raise Exception(f"{path} is not a valid file, cannot securely delete!")
+
+    with open(path, "ba+", buffering=0) as delfile:
+        length = delfile.tell()
+    delfile.close()
+    with open(path, "br+", buffering=0) as delfile:
+        for i in range(passes):
+            delfile.seek(0, 0)
+            delfile.write(os.urandom(length))
+        delfile.seek(0)
+        for x in range(length):
+            delfile.write(b'\x00')
+    # file deletion
+    os.remove(path)
+
+    if pycryptex.config_params.verbose:
+        click.echo(click.style(f"secure deletion of {path} with {passes} passes", fg="magenta", bold=False))
