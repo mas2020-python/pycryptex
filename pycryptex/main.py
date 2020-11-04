@@ -27,7 +27,7 @@ class Config():
 pass_config = click.make_pass_decorator(Config, ensure=True)
 
 
-def get_decrypt_files(ctx, args, incomplete):
+def get_files_folders(ctx, args, incomplete):
     """
     Autocompletion function for the 'decrypt' command: searches for file or dir starting with the typed characters
     :param ctx:
@@ -62,8 +62,8 @@ def cli(config, verbose):
 
 
 @cli.command()
-@click.argument('file', required=True, autocompletion=get_decrypt_files)
-@click.option('--pubkey', default="", help='(optional) specify the RSA public key')
+@click.argument('file', required=True, autocompletion=get_files_folders)
+@click.option('--pubkey', default="", help='(optional) specify the RSA public key', autocompletion=get_files_folders)
 @click.option('--keep', '-k', is_flag=True, default=False,
               help="(optional, bool=False) if specified, do not remove the original file")
 @click.option('--no-nested', is_flag=True, default=False,
@@ -101,8 +101,8 @@ def encrypt(config, file, pubkey, keep, no_nested):
 
 
 @cli.command()
-@click.argument('file', required=True, autocompletion=get_decrypt_files)
-@click.option('--privkey', default="", help='(optional) specify the RSA private key')
+@click.argument('file', required=True, autocompletion=get_files_folders)
+@click.option('--privkey', default="", help='(optional) specify the RSA private key', autocompletion=get_files_folders)
 @click.option('--keep', '-k', is_flag=True, default=False,
               help="(optional, bool=False) if specified, do not remove the original file")
 @click.option('--pager', '-p', is_flag=True,
@@ -225,7 +225,7 @@ def show_config(config):
 
 
 @cli.command()
-@click.argument('file', required=True, autocompletion=get_decrypt_files)
+@click.argument('file', required=True, autocompletion=get_files_folders)
 @click.option('--keep', '-k', is_flag=True, default=False,
               help="(optional, bool=False) if specified, do not remove the original file")
 @click.option('--no-nested', is_flag=True, default=False,
@@ -242,7 +242,7 @@ def encrypt_aes(config, file, keep, no_nested):
 
 
 @cli.command()
-@click.argument('file', required=True, autocompletion=get_decrypt_files)
+@click.argument('file', required=True, autocompletion=get_files_folders)
 @click.option('--keep', '-k', is_flag=True, default=False,
               help="(optional, bool=False) if specified, do not remove the original file")
 @click.option('--no-nested', is_flag=True, default=False,
