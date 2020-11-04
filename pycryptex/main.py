@@ -85,8 +85,36 @@ def encrypt(config, file, pubkey, keep, no_nested):
         sys.exit(2)
 
 
+def get_decrypt_files(ctx, args, incomplete):
+    """
+    Autocompletion function for the 'decrypt' command: searches for file or dir starting with the typed characters
+    :param ctx:
+    :param args:
+    :param incomplete:
+    :return:
+    """
+
+    """
+    input could be:
+    - /test/x
+    - test/x
+    - x
+    """
+    # ALGO TODO:
+    # if incomplete is a dir, return current_dir = incomplete, init_word = ""
+    # if incomplete is NOT a dir, join with os.getcwd(): if join is a dir => current_dir = incomplete, , init_word = ""
+    # if incomplete contains / remove the last word previous the last slash, join it with os.getcwd():
+    #   if join is a dir => current_dir = join, initial_word = last part
+    # return initial_word == incomplete
+    current_directory = Path(os.getcwd())
+    # check first if incomplete is a dir
+    if os.path.isdir(os.path.join(Path(os.getcwd()), incomplete)):
+        current_directory = os.path.join(Path(os.getcwd()), incomplete)
+    return [str(f.name) for f in current_directory.iterdir() if str(f.name).startswith(incomplete)]
+    #return [str(f.name) for f in current_directory.iterdir()]
+
 @cli.command()
-@click.argument('file', required=True)
+@click.argument('file', required=True, autocompletion=get_decrypt_files)
 @click.option('--privkey', default="", help='(optional) specify the RSA private key')
 @click.option('--keep', '-k', is_flag=True, default=False,
               help="(optional, bool=False) if specified, do not remove the original file")
