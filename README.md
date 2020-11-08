@@ -239,7 +239,7 @@ source venv/bin/activate
 python3 -m pip install --upgrade pip
 pip install --upgrade setuptools
 pip install -r requirements.txt
-python3 -m pip install pytest
+python3 -m pip install pytest wheel twine
 
 # (optional) to test type
 python3 -m Crypto.SelfTest
