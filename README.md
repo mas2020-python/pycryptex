@@ -130,7 +130,17 @@ pager = "vim"
 private-key = ""
 # default public key for RSA encryption
 public-key = ""
+# (default false) true/false to secure delete files (if activated deletion of files becomes slower)
+secure-deletion = false
+# number of passes for secure deletion. Means how many times PyCryptex write random data into the file.
+# greater is the number you adopt, major security you introduce but deletion becomes slower.
+secure-deletion-passes = 1
 ```
+
+#### Secure file deletion
+Starting from `0.5.0` it is possible to set the config key `secure-deletion` = true. Doing this, the clear file/s, 
+after the encryption, will be removed safely. It's possible to configure how many passes to run to mix up the file content
+before deleting it.
 
 ### List of all commands
 
@@ -222,11 +232,14 @@ _PYCRYPTEX_COMPLETE=source_fish pycryptex > ~/.config/fish/completions/pycryptex
 
 If you want to contribute to that project, after cloning the repo type:
 ```shell script
+git clone https://github.com/mas2020-python/pycryptex.git
+cd pycryptex
 python3 -m venv venv
 source venv/bin/activate
 python3 -m pip install --upgrade pip
 pip install --upgrade setuptools
 pip install -r requirements.txt
+python3 -m pip install pytest
 
 # (optional) to test type
 python3 -m Crypto.SelfTest
@@ -239,7 +252,6 @@ ssh-keygen -t rsa -b 4096 -C "<your-user>@<your-domain>"
 
 To install the executable package type:
 ````shell script
-git clone https://github.com/mas2020-python/pycryptex.git
 pip3 install --editable .
 ````
 

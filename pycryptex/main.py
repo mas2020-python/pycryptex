@@ -13,18 +13,12 @@ from pycryptex.crypto import common
 from pycryptex.crypto.aes import AESCryptex
 
 
-class Config():
-    """
-    This class is to pass some configuration trough the commands
-    """
 
-    def __init__(self):
-        pass
 
 
 # Decorator that will create a new instance of Config class. The instance is config and the object can be passed
 # through the commands
-pass_config = click.make_pass_decorator(Config, ensure=True)
+pass_config = click.make_pass_decorator(pycryptex.Config, ensure=True)
 
 
 @click.group()
@@ -43,6 +37,7 @@ def cli(config, verbose):
 
     #happyencryption
     """
+    pycryptex.config_params = config
     config.verbose = verbose
 
 
@@ -183,13 +178,16 @@ def create_keys(config):
 
 
 @cli.command()
+@click.option('--force', '-f', is_flag=True, default=False,
+              help="(optional, bool=False) if specified, remove the pycryptex config file is present before create "
+                   "the new one")
 @pass_config
-def create_config(config):
+def create_config(config, force):
     """
     Create the config file in the $HOME/.pycryptex folder if the file doesn't exist
     """
     try:
-        if utils.create_config():
+        if utils.create_config(force):
             click.echo(click.style(f"👍 pycryptex.toml file created in: "
                                    f"{os.path.join(utils.get_home(), '.pycryptex', 'pycryptex.toml')}", fg="green",
                                    bold=False))
@@ -349,3 +347,4 @@ def encrypt_decrypt_aes(config, file, keep, no_nested, is_encryption: bool):
 if __name__ == '__main__':
     print("main invoked!")
     cli(sys.argv[1:])
+    # utils.secure_delete("/Users/andrea.genovesi/Downloads/AG picture copy.jpg", 1)
