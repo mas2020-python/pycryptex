@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - new `show-config` command to show the configuration file if present into the $HOME/.pycryptex folder
 - `--force` option to `create-config` command
+- new config keys (***secure-deletion*** and ***secure-deletion-passes***) to set securely deletion of clear files in encryption operations
 
 ### Fixed
 - 
