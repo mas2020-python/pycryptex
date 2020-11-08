@@ -133,9 +133,14 @@ public-key = ""
 # (default false) true/false to secure delete files (if activated deletion of files becomes slower)
 secure-deletion = false
 # number of passes for secure deletion. Means how many times PyCryptex write random data into the file.
-# greater is the number you adopt major security but deletion becomes slower
+# greater is the number you adopt, major security you introduce but deletion becomes slower.
 secure-deletion-passes = 1
 ```
+
+#### Secure file deletion
+Starting from `0.5.0` it is possible to set the config key `secure-deletion` = true. Doing this, the clear file/s, 
+after the encryption, will be removed safely. It's possible to configure how many passes to run to mix up the file content
+before deleting it.
 
 ### List of all commands
 
