@@ -3,7 +3,7 @@
 This project can be used as:
 
 - CLI application for encryption and decryption
-- a package to import in you project to create an encryption/decryption app
+- a package to import in your personal project to create an encryption/decryption app
 
 For the CLI functionality it uses `click` package and for the encryption the amazing `pycryptodome` package.
 
@@ -65,6 +65,26 @@ pycryptex decrypt <FILE-OR-FOLDER>
 ```
 That's it for the PyCryptex in a `nutshell`. Go ahead with the lecture to figure out how to make the most of the application.
 
+#### Decryption with a pager
+Pager option behaviour is changed in version `0.5.0`. Now it is possible to use `decryption` also for reading a file without saving the clear file on the system (if it is not needed).
+Actually the pager is enabled only for the command `decrypt` and not for the command `decrypt-aes`.
+So, for example if you decrypt without option:
+```shell script
+pycryptex decrypt <FILE-OR-FOLDER>
+```
+PyCryptex will save the decrypted file on the file system, instead if you type:
+```shell script
+pycryptex decrypt <FILE-OR-FOLDER> --pager
+```
+PyCryptex will decrypt the file in memory and redirect it on the standard input of the pager set in your configuration file.
+Starting from `0.5.0` version is also changed the default pager in favour of 'less' instead of 'vim'.
+You can change it to use your favourite pager (simply create the configuration file `pycryptex create-config` then edit it),
+some examples are:
+- `code -` to use Visual Studio Code (to enable the command `code` see the Microsoft site)
+- `sublime -` to use with sublime (in case you do not have it on the executable in PATH, see on the official documentation to solve the issue)
+- `vim -` to use vim
+- `nano -` to use nano (starting from version 2.2)
+
 ***Happy Encryption!!!***
 
 ### Using application
@@ -76,7 +96,7 @@ pycryptex --help
 
 PyCryptex encryption works with symmetric or asymmetric algorithms based on the arguments passed.
 To the standard encryption/decryption ``pycryptex`` uses RSA keys pair. In particular, it encrypts using the public key of the user and decrypts
-using the private key. For better performance ``pycryptex`` behind the scene uses for encryption and decryption the AES algorithm.
+using the private key. For better performance ``pycryptex`` behind the scene uses the AES algorithm.
 The RSA keys are used to encrypt and decrypt the random key generated and stored as header to the file.
 In this way the performance are definitely better on a large file (a 256 bit AES random key is used).
 
@@ -88,7 +108,6 @@ The folder where **`pycryptex`** searches for the key is your $HOME/.pycryptex. 
 keys you can pass them directly as an argument to the encrypt and decrypt method.
 
 An alternative, starting from version 0.4.0, could be save the path of the keys in the pycryptex confi file.
-
 
 **PyCryptex determines the RSA keys to use** for the `encrypt` and `decrypt` methods, follow these rules:
 
@@ -111,7 +130,17 @@ pager = "vim"
 private-key = ""
 # default public key for RSA encryption
 public-key = ""
+# (default false) true/false to secure delete files (if activated deletion of files becomes slower)
+secure-deletion = false
+# number of passes for secure deletion. Means how many times PyCryptex write random data into the file.
+# greater is the number you adopt, major security you introduce but deletion becomes slower.
+secure-deletion-passes = 1
 ```
+
+#### Secure file deletion
+Starting from `0.5.0` it is possible to set the config key `secure-deletion` = true. Doing this, the clear file/s, 
+after the encryption, will be removed safely. It's possible to configure how many passes to run to mix up the file content
+before deleting it.
 
 ### List of all commands
 
@@ -125,6 +154,7 @@ Follow the list of commands:
 - `decrypt`: to decrypt a single file a single file or a folder (including sub folders).
 - `create-keys`: to create a public key and private key pair.
 - `create-config`: to create the default config file under $HOME/.pycryptex/pycryptex.toml
+- `show-config`: to show the configuration file if present into the $HOME/.pycryptex folder
 - `encrypt-aes`: to encrypt a single file or a folder (including sub folders) using AES algorithm.
 - `decrypt-aes`: to decrypt a single file a single file or a folder (including sub folders) using AES algorithm.
 
@@ -141,18 +171,18 @@ pycryptex encrypt test/secret.txt
 pycryptex encrypt test/secret.txt --keep
 
 # decrypt the file
-pycryptex --verbose decrypt --privkey test/id_rsa test/secrets.txt.enc
+pycryptex --verbose decrypt --privkey test/id_rsa test/secrets.txt.pycpx
 
 # decrypt using your own private key and open the pager
-pycryptex --verbose decrypt --privkey test/id_rsa -p test/secrets.txt.enc
+pycryptex --verbose decrypt --privkey test/id_rsa -p test/secrets.txt.pycpx
 
 # decrypt and open the pager (loading keys from $HOME/.pycryptex)
-pycryptex decrypt -p test/secrets.txt.enc
+pycryptex decrypt -p test/secrets.txt.pycpx
 
 # to create private/public key pairs
 pycryptex create-keys
 ````
-To combine decrypt + read a file + encrypt again you can use something as:
+To combine decrypt + read and modify a file + encrypt again you can use something as:
 ```shell script
 pycryptex decrypt --privkey <YOUR-PATH-TO-PRIVATE-KEY> <FILE.pycypx> \
 && vim <FILE> && \
@@ -160,16 +190,56 @@ pycryptex encrypt --pubkey <YOUR-PATH-TO-PUBLIC-KEY> <FILE>
 ```
 By this way, you can change the clear content also using the right pager, as vim for example.
 In case your keys are in your `pycryptex` HOME folder or set into the `pycryptex.toml` file, you can omit to pass them.
+If you need only read an encrypted file content use simple the --pager option as described before.
+
+### Shell auto completion for pycryptex
+PyCryptex commands, options and arguments can be added to your favourite shell for the auto completion.
+After you have installed the application follow the instructions choosing the shell you have.
+
+#### `bash` configuration
+If your favourite shell is **`bash`** then type:
+```shell script
+cd <YOUR-FOLDER>
+# type this command
+_PYCRYPTEX_COMPLETE=source_bash pycryptex > pycryptex.sh
+```
+now you that have the file `pycryptex.sh` open you $HOME/.bashrc file and add this content:
+```shell script
+vim $HOME/.bashrc
+source /PATH-TO-PYCRYPTEX-SCRIPT/pycryptex.sh
+```
+
+#### `zsh` configuration
+If your favourite shell is **`zsh`** then type:
+```shell script
+cd <YOUR-FOLDER>
+# type this command
+_PYCRYPTEX_COMPLETE=source_zsh pycryptex > pycryptex.sh
+```
+now you that have the file `pycryptex.sh` open you $HOME/.zshrc file and add this content:
+```shell script
+vim $HOME/.zshrc
+source /PATH-TO-PYCRYPTEX-SCRIPT/pycryptex.sh
+```
+
+#### `fish` configuration
+If your favourite shell is **`fish`** then type:
+```shell script
+_PYCRYPTEX_COMPLETE=source_fish pycryptex > ~/.config/fish/completions/pycryptex-complete.fish
+```
 
 ## Configuration for developers
 
 If you want to contribute to that project, after cloning the repo type:
 ```shell script
+git clone https://github.com/mas2020-python/pycryptex.git
+cd pycryptex
 python3 -m venv venv
 source venv/bin/activate
 python3 -m pip install --upgrade pip
 pip install --upgrade setuptools
 pip install -r requirements.txt
+python3 -m pip install pytest wheel twine
 
 # (optional) to test type
 python3 -m Crypto.SelfTest
@@ -182,7 +252,6 @@ ssh-keygen -t rsa -b 4096 -C "<your-user>@<your-domain>"
 
 To install the executable package type:
 ````shell script
-git clone https://github.com/mas2020-python/pycryptex.git
 pip3 install --editable .
 ````
 

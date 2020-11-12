@@ -13,18 +13,12 @@ from pycryptex.crypto import common
 from pycryptex.crypto.aes import AESCryptex
 
 
-class Config():
-    """
-    This class is to pass some configuration trough the commands
-    """
 
-    def __init__(self):
-        pass
 
 
 # Decorator that will create a new instance of Config class. The instance is config and the object can be passed
 # through the commands
-pass_config = click.make_pass_decorator(Config, ensure=True)
+pass_config = click.make_pass_decorator(pycryptex.Config, ensure=True)
 
 
 @click.group()
@@ -33,14 +27,17 @@ pass_config = click.make_pass_decorator(Config, ensure=True)
 @pass_config
 def cli(config, verbose):
     """
-    This command is executed before other commands in the same group. The group commands
-    are between the main command (pycrypto) and the single commands.
+    pycryptex is a CLI application to help you easily encrypt/decrypt some files or
+    folders.
 
     For instance:
-    pycryptex --verbose encrypt test/appway.png
+    pycryptex --verbose encrypt test/mysecret.yaml
 
-    Using config.verbose is possible to pass verbose from a command to another
+    Use --verbose between pycryptex and the command to have debugging information.
+
+    #happyencryption
     """
+    pycryptex.config_params = config
     config.verbose = verbose
 
 
@@ -70,9 +67,10 @@ def encrypt(config, file, pubkey, keep, no_nested):
             # encryption of the file
             f, done = common.encrypt_file(file=file, func=rsa.encrypt_data, remove=not keep, public_key=pubkey)
             if done:
-                click.echo(click.style(f"👍 File encrypted successfully in {f}! [key used: {pubkey}]", fg="green", bold=True))
+                click.echo(
+                    click.style(f"👍 File encrypted successfully in {f}! [key used: {pubkey}]", fg="green", bold=True))
             else:
-                click.echo(click.style(f"👍 Nothing to do, file already encrypted!", fg="yellow", bold=False))
+                click.echo(click.style(f"● Nothing to do, file already encrypted!", fg="white", bold=False))
 
         if config.verbose:
             click.echo(click.style(f"pubkey used is: {pubkey}", fg="magenta", bold=False))
@@ -110,15 +108,24 @@ def decrypt(config, file, privkey, keep, pager, no_nested):
                                    no_nested=no_nested, passprhase=passphrase, private_key=privkey)
             click.echo(click.style(f"👍 Folder decrypted successfully! [key used: {privkey}]", fg="green", bold=True))
         else:  # single file case
-            f, done = common.decrypt_file(file=file, func=rsa.decrypt_data, remove=not keep, passprhase=passphrase,
-                                          private_key=privkey)
-            if done:
-                click.echo(click.style(f"👍 File decrypted successfully in {f}! [key used: {privkey}]", fg="green", bold=True))
-            else:
-                click.echo(click.style(f"👍 Nothing to do, file already decrypted!", fg="yellow", bold=False))
             # open file in a pager
             if pager:
-                utils.open_pager(config, f)
+                # read the file
+                with open(file, 'rb') as byte_reader:
+                    # Read all bytes
+                    enc_bytes = byte_reader.read(-1)
+                # get decrypted data
+                dec_bytes = rsa.decrypt_data(enc_bytes, privkey, passphrase)
+                utils.open_pager(config, dec_bytes)
+            else:
+                f, done = common.decrypt_file(file=file, func=rsa.decrypt_data, remove=not keep, passprhase=passphrase,
+                                              private_key=privkey)
+                if done:
+                    click.echo(click.style(f"👍 File decrypted successfully in {f}! [key used: {privkey}]", fg="green",
+                                           bold=True))
+                else:
+                    click.echo(click.style(f"● Nothing to do, file already decrypted!", fg="white", bold=False))
+
 
     except ValueError as e:
         click.echo(click.style(f"Houston, help: it is possible that you use the wrong key file to decrypt "
@@ -171,23 +178,33 @@ def create_keys(config):
 
 
 @cli.command()
+@click.option('--force', '-f', is_flag=True, default=False,
+              help="(optional, bool=False) if specified, remove the pycryptex config file is present before create "
+                   "the new one")
 @pass_config
-def create_config(config):
+def create_config(config, force):
     """
     Create the config file in the $HOME/.pycryptex folder if the file doesn't exist
     """
     try:
-        if utils.create_config():
+        if utils.create_config(force):
             click.echo(click.style(f"👍 pycryptex.toml file created in: "
                                    f"{os.path.join(utils.get_home(), '.pycryptex', 'pycryptex.toml')}", fg="green",
                                    bold=False))
         else:
-            click.echo(click.style(f"👍 Nothing to do, file "
+            click.echo(click.style(f"● Nothing to do, file "
                                    f"{os.path.join(utils.get_home(), '.pycryptex', 'pycryptex.toml')} already exists!",
-                                   fg="magenta", bold=False))
+                                   fg="white", bold=False))
     except Exception as e:
         click.echo(click.style(f"● Houston, help: {e}", fg="red", bold=True))
         sys.exit(2)
+
+
+@cli.command()
+@pass_config
+def show_config(config):
+    """Show the config file content (if it is present in $HOME/.pycryptex)"""
+    utils.show_config()
 
 
 @cli.command()
@@ -254,7 +271,8 @@ def load_key(key_path: str, key_config_name: str, key_default: str) -> str:
                    "the keys for you, type:\n"
                    "pycryptex create-keys")
         sys.exit(2)
-    return  key_path
+    return key_path
+
 
 @timer
 def encrypt_decrypt_folder(func, is_encrypt: bool, folder: str, keep: bool, no_nested: bool = False, **kwargs):
@@ -320,7 +338,7 @@ def encrypt_decrypt_aes(config, file, keep, no_nested, is_encryption: bool):
         if done:
             click.echo(click.style(f"👍 File {crypto_term} successfully in {f}", fg="green", bold=True))
         else:
-            click.echo(click.style(f"👍 Nothing to do, file already {crypto_term}!", fg="yellow", bold=False))
+            click.echo(click.style(f"● Nothing to do, file already {crypto_term}!", fg="white", bold=False))
 
     if config.verbose:
         click.echo(click.style(f"config_file loaded: {pycryptex.config_file}", fg="magenta", bold=True))
@@ -329,3 +347,4 @@ def encrypt_decrypt_aes(config, file, keep, no_nested, is_encryption: bool):
 if __name__ == '__main__':
     print("main invoked!")
     cli(sys.argv[1:])
+    # utils.secure_delete("/Users/andrea.genovesi/Downloads/AG picture copy.jpg", 1)
