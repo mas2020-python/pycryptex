@@ -4,16 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.5.0] - 2020-xx-xx
+## [0.5.0] - 2020-11-12
 
 ### Added
 
 - new `show-config` command to show the configuration file if present into the $HOME/.pycryptex folder
 - `--force` option to `create-config` command
 - new config keys (***secure-deletion*** and ***secure-deletion-passes***) to set securely deletion of clear files in encryption operations
-
-### Fixed
-- 
 
 ### Changed
 - changed the behaviour option --pager for `decrypt`. Now it decrypts in memory and open the pager set in the configuration file. 
